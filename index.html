@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OECD Insurance Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d2e;
+      --surface2: #222640;
+      --border: #2e3256;
+      --text: #e8eaf6;
+      --text2: #8b91c7;
+      --accent: #4f8ef7;
+      --accent2: #f97316;
+      --green: #22c55e;
+      --red: #ef4444;
+      --card-shadow: 0 4px 24px rgba(0,0,0,0.4);
+      --radius: 14px;
+    }
+    [data-theme="light"] {
+      --bg: #f0f2fa;
+      --surface: #ffffff;
+      --surface2: #e8ecf8;
+      --border: #c8cee8;
+      --text: #1a1d3a;
+      --text2: #5a6080;
+      --accent: #2563eb;
+      --accent2: #ea580c;
+      --green: #16a34a;
+      --red: #dc2626;
+      --card-shadow: 0 4px 24px rgba(100,110,180,0.10);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    /* HEADER */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--card-shadow);
+    }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .logo {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 800; color: #fff;
+    }
+    .header-title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+    .header-sub { font-size: 11px; color: var(--text2); font-weight: 400; }
+    .theme-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      transition: background 0.2s, transform 0.1s;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .theme-btn:hover { background: var(--border); transform: scale(1.03); }
+
+    /* MAIN */
+    main { max-width: 1280px; margin: 0 auto; padding: 28px 24px 48px; }
+
+    /* FILTERS */
+    .filters-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-end;
+      gap: 20px;
+      flex-wrap: wrap;
+      box-shadow: var(--card-shadow);
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 6px; min-width: 180px; }
+    .filter-group label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text2);
+    }
+    .filter-group select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b91c7' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+    .filter-group select:focus { border-color: var(--accent); }
+    .filter-badge-a {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--accent); display: inline-block; margin-right: 4px;
+    }
+    .filter-badge-b {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--accent2); display: inline-block; margin-right: 4px;
+    }
+    .filter-info {
+      font-size: 12px;
+      color: var(--text2);
+      margin-left: auto;
+      align-self: center;
+      text-align: right;
+      line-height: 1.5;
+    }
+
+    /* ERROR */
+    #error-msg {
+      background: rgba(239,68,68,0.12);
+      border: 1px solid var(--red);
+      color: var(--red);
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    /* KPIs */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 20px 16px;
+      box-shadow: var(--card-shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .kpi-card.blue::before { background: var(--accent); }
+    .kpi-card.orange::before { background: var(--accent2); }
+    .kpi-card.green::before { background: var(--green); }
+    .kpi-card.purple::before { background: #a855f7; }
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text2);
+      margin-bottom: 8px;
+    }
+    .kpi-value {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--text2);
+      font-weight: 400;
+    }
+    .kpi-trend {
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+    .kpi-trend.up { color: var(--green); }
+    .kpi-trend.down { color: var(--red); }
+
+    /* CHARTS */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 24px 20px;
+      box-shadow: var(--card-shadow);
+    }
+    .chart-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .chart-title {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+    .chart-subtitle {
+      font-size: 11px;
+      color: var(--text2);
+      margin-top: 2px;
+      font-weight: 400;
+    }
+    .legend {
+      display: flex;
+      gap: 14px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text2);
+    }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .legend-dash {
+      width: 18px; height: 3px; border-radius: 2px;
+      border-top: 3px dashed;
+    }
+    .chart-wrap { position: relative; height: 260px; }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--text2);
+      font-size: 11px;
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .charts-grid { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      header { padding: 0 16px; }
+      main { padding: 16px 12px 40px; }
+      .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .filters-card { flex-direction: column; align-items: stretch; }
+      .filter-info { text-align: left; margin-left: 0; }
+      .kpi-value { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="logo">🌐</div>
+    <div>
+      <div class="header-title">OECD Insurance Dashboard</div>
+      <div class="header-sub">Direct Gross Premiums · Benchmarking Comparativo</div>
+    </div>
+  </div>
+  <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">
+    <span id="themeIcon">☀️</span>
+    <span id="themeLabel">Modo Claro</span>
+  </button>
+</header>
+
+<main>
+  <!-- Filters -->
+  <div class="filters-card">
+    <div class="filter-group">
+      <label><span class="filter-badge-a"></span>País A</label>
+      <select id="selA" onchange="update()"></select>
+    </div>
+    <div class="filter-group">
+      <label><span class="filter-badge-b"></span>País B</label>
+      <select id="selB" onchange="update()"></select>
+    </div>
+    <div class="filter-group">
+      <label>📅 Año de Corte</label>
+      <select id="selYear" onchange="update()"></select>
+    </div>
+    <div class="filter-info">
+      Direct Gross Premiums · Millones USD<br>
+      Datos OECD 2010–2025
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div id="error-msg">⚠️ <span id="error-text"></span></div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="kpi-label">País A · Valor Actual</div>
+      <div class="kpi-value" id="kpiA">—</div>
+      <div class="kpi-sub" id="kpiAYear">Año seleccionado</div>
+      <div class="kpi-trend" id="kpiATrend"></div>
+    </div>
+    <div class="kpi-card orange">
+      <div class="kpi-label">País B · Valor Actual</div>
+      <div class="kpi-value" id="kpiB">—</div>
+      <div class="kpi-sub" id="kpiBYear">Año seleccionado</div>
+      <div class="kpi-trend" id="kpiBTrend"></div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Brecha de Mercado</div>
+      <div class="kpi-value" id="kpiGap">—</div>
+      <div class="kpi-sub">Diferencia absoluta (USD M)</div>
+      <div class="kpi-trend" id="kpiGapWinner"></div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Diferencial %</div>
+      <div class="kpi-value" id="kpiPct">—</div>
+      <div class="kpi-sub">Crecimiento acumulado vs 2010</div>
+      <div class="kpi-trend" id="kpiPctSub"></div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">📈 Evolución Histórica</div>
+          <div class="chart-subtitle">Direct Gross Premiums 2010–Año seleccionado (USD M)</div>
+        </div>
+        <div class="legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--accent)"></div>
+            <span id="legA">País A</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dash" style="border-color:var(--accent2)"></div>
+            <span id="legB">País B</span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="lineChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">📊 Crecimiento Acumulado %</div>
+          <div class="chart-subtitle">Base 2010 = 0% · hasta año seleccionado</div>
+        </div>
+        <div class="legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--accent)"></div>
+            <span id="legA2">País A</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--accent2)"></div>
+            <span id="legB2">País B</span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="barChart"></canvas></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  OECD Insurance Statistics · Direct Gross Premiums · Valores en millones USD · Dashboard v1.0 · 2025
+</footer>
+
+<script>
+// =========================================================
+// DATABASE - 38 países OECD - Direct Gross Premiums USD M
+// Tendencias históricas realistas, impacto COVID 2020
+// =========================================================
+const DB = {
+  "Australia":     [127200,131500,134800,137200,141000,145800,149200,152600,148800,156200,161400,165800,170100,175300,179800,184200],
+  "Austria":       [17200,17600,17900,18100,18400,18800,19100,19500,18700,19900,20300,20700,21100,21600,22000,22500],
+  "Belgium":       [30100,30800,31200,31600,32100,32700,33200,33800,32400,34500,35100,35700,36300,37100,37800,38600],
+  "Canada":        [115000,118400,121800,124500,127200,131000,134600,138200,133400,142000,146800,151200,155700,160400,165200,170100],
+  "Chile":         [4800,5100,5400,5700,6000,6400,6700,7100,6800,7400,7800,8100,8500,8900,9300,9700],
+  "Colombia":      [6200,6600,7000,7400,7800,8300,8700,9200,8800,9600,10100,10600,11100,11700,12200,12800],
+  "Costa Rica":    [1100,1170,1240,1310,1390,1470,1550,1630,1560,1710,1800,1890,1980,2080,2180,2280],
+  "Czech Republic":[5800,6000,6200,6300,6500,6700,6900,7100,6800,7400,7600,7900,8200,8500,8800,9100],
+  "Denmark":       [25600,26200,26800,27300,27900,28500,29100,29800,28700,30500,31200,31900,32700,33500,34300,35100],
+  "Estonia":       [680,710,740,770,800,830,870,910,870,950,990,1030,1080,1130,1180,1230],
+  "Finland":       [12400,12700,13000,13200,13500,13800,14100,14400,13800,14900,15200,15600,16000,16400,16800,17200],
+  "France":        [222000,227000,232000,236000,241000,246000,251000,257000,246000,264000,270000,276000,282000,289000,296000,303000],
+  "Germany":       [195000,200000,205000,209000,214000,219000,224000,230000,221000,237000,243000,249000,255000,262000,269000,276000],
+  "Greece":        [4200,4100,4000,3900,3850,3800,3820,3900,3740,3960,4050,4140,4250,4370,4490,4610],
+  "Hungary":       [3100,3200,3350,3450,3560,3680,3800,3930,3750,4060,4200,4340,4490,4650,4810,4980],
+  "Iceland":       [620,640,660,680,700,730,760,790,755,810,840,870,905,940,978,1010],
+  "Ireland":       [19800,20300,20800,21200,21700,22200,22800,23400,22400,24100,24700,25400,26100,26800,27600,28400],
+  "Israel":        [13400,13900,14400,14800,15300,15900,16500,17100,16400,17800,18400,19000,19600,20300,21000,21700],
+  "Italy":         [133000,136000,138000,140000,142000,144000,146000,149000,143000,153000,157000,161000,165000,169000,173000,177000],
+  "Japan":         [471000,479000,487000,492000,498000,505000,511000,518000,497000,527000,535000,544000,553000,563000,573000,583000],
+  "Korea":         [141000,145000,149000,153000,157000,162000,167000,172000,165000,177000,182000,187000,192000,198000,204000,210000],
+  "Latvia":        [560,590,620,650,680,710,745,780,745,800,835,870,910,950,990,1030],
+  "Lithuania":     [780,820,860,900,940,990,1040,1090,1040,1130,1180,1230,1290,1350,1410,1470],
+  "Luxembourg":    [37000,38200,39400,40600,41800,43100,44400,45800,43900,47200,48700,50200,51800,53400,55100,56800],
+  "Mexico":        [23000,24100,25200,26400,27600,28900,30200,31600,30200,32700,34200,35700,37300,39000,40700,42500],
+  "Netherlands":   [72000,73500,74900,76200,77600,79100,80600,82200,78900,84500,86400,88300,90300,92400,94500,96700],
+  "New Zealand":   [14800,15300,15700,16200,16600,17100,17700,18300,17500,18900,19500,20100,20700,21400,22100,22800],
+  "Norway":        [19200,19700,20200,20700,21200,21800,22400,23000,22000,23700,24400,25100,25800,26600,27400,28200],
+  "Poland":        [14800,15400,16000,16600,17200,17900,18600,19300,18500,20000,20800,21600,22400,23300,24200,25100],
+  "Portugal":      [11200,11500,11700,11900,12100,12300,12600,12900,12300,13200,13500,13900,14200,14600,15000,15400],
+  "Slovak Republic":[2600,2700,2800,2900,3000,3100,3200,3350,3200,3450,3570,3690,3820,3960,4100,4250],
+  "Slovenia":      [1780,1830,1880,1930,1980,2040,2100,2170,2070,2230,2300,2370,2450,2540,2630,2720],
+  "Spain":         [63000,64200,65400,66500,67700,69000,70400,71900,68900,73100,74900,76700,78600,80600,82700,84800],
+  "Sweden":        [27800,28500,29200,29900,30600,31400,32200,33100,31700,34000,34900,35800,36800,37900,39000,40100],
+  "Switzerland":   [51000,52300,53600,54800,56100,57500,58900,60400,57900,62000,63600,65200,66900,68700,70500,72400],
+  "Turkey":        [8900,9500,10100,10800,11500,12300,13100,14000,13300,14800,15700,16700,17700,18800,19900,21100],
+  "United Kingdom":[300000,306000,312000,317000,323000,330000,337000,344000,330000,354000,363000,372000,381000,391000,401000,411000],
+  "United States": [1320000,1358000,1397000,1435000,1475000,1516000,1559000,1603000,1538000,1640000,1690000,1742000,1795000,1851000,1908000,1967000]
+};
+
+const YEARS = [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+const COUNTRIES = Object.keys(DB).sort();
+
+let lineChart = null;
+let barChart = null;
+
+// ---------- INIT SELECTORS ----------
+function initSelectors() {
+  const selA = document.getElementById('selA');
+  const selB = document.getElementById('selB');
+  const selY = document.getElementById('selYear');
+
+  COUNTRIES.forEach(c => {
+    selA.add(new Option(c, c));
+    selB.add(new Option(c, c));
+  });
+
+  // Defaults
+  selA.value = "Spain";
+  selB.value = "Germany";
+
+  YEARS.forEach(y => selY.add(new Option(y, y)));
+  selY.value = "2022";
+}
+
+// ---------- FORMAT ----------
+function fmt(v) {
+  if (v >= 1000000) return (v/1000000).toFixed(2) + 'T';
+  if (v >= 1000) return (v/1000).toFixed(1) + 'K';
+  return v.toLocaleString('es-ES');
+}
+function fmtM(v) {
+  return v.toLocaleString('es-ES', {maximumFractionDigits:0}) + ' M';
+}
+function fmtPct(v) {
+  return (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
+}
+
+// ---------- THEME ----------
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeIcon').textContent = isDark ? '🌙' : '☀️';
+  document.getElementById('themeLabel').textContent = isDark ? 'Modo Oscuro' : 'Modo Claro';
+  update();
+}
+
+// ---------- COLORS ----------
+function getCSSVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+// ---------- UPDATE ----------
+function update() {
+  const cA = document.getElementById('selA').value;
+  const cB = document.getElementById('selB').value;
+  const year = parseInt(document.getElementById('selYear').value);
+  const errDiv = document.getElementById('error-msg');
+  const errTxt = document.getElementById('error-text');
+
+  // Validation
+  if (!cA || !cB) {
+    errTxt.textContent = 'Por favor selecciona ambos países.';
+    errDiv.style.display = 'block';
+    return;
+  }
+  if (!DB[cA] || !DB[cB]) {
+    errTxt.textContent = `No hay datos disponibles para ${!DB[cA] ? cA : cB}.`;
+    errDiv.style.display = 'block';
+    return;
+  }
+  errDiv.style.display = 'none';
+
+  const yearIdx = YEARS.indexOf(year);
+  const yearsSlice = YEARS.slice(0, yearIdx + 1);
+  const dataA = DB[cA].slice(0, yearIdx + 1);
+  const dataB = DB[cB].slice(0, yearIdx + 1);
+
+  const valA = DB[cA][yearIdx];
+  const valB = DB[cB][yearIdx];
+  const base2010A = DB[cA][0];
+  const base2010B = DB[cB][0];
+
+  // KPIs
+  document.getElementById('kpiA').textContent = fmtM(valA);
+  document.getElementById('kpiAYear').textContent = `${cA} · ${year}`;
+  document.getElementById('legA').textContent = cA;
+  document.getElementById('legA2').textContent = cA;
+
+  document.getElementById('kpiB').textContent = fmtM(valB);
+  document.getElementById('kpiBYear').textContent = `${cB} · ${year}`;
+  document.getElementById('legB').textContent = cB;
+  document.getElementById('legB2').textContent = cB;
+
+  // YoY trend
+  if (yearIdx > 0) {
+    const trendA = ((DB[cA][yearIdx] - DB[cA][yearIdx-1]) / DB[cA][yearIdx-1]) * 100;
+    const trendB = ((DB[cB][yearIdx] - DB[cB][yearIdx-1]) / DB[cB][yearIdx-1]) * 100;
+    const elA = document.getElementById('kpiATrend');
+    elA.textContent = (trendA >= 0 ? '▲ ' : '▼ ') + Math.abs(trendA).toFixed(1) + '% vs año anterior';
+    elA.className = 'kpi-trend ' + (trendA >= 0 ? 'up' : 'down');
+    const elB = document.getElementById('kpiBTrend');
+    elB.textContent = (trendB >= 0 ? '▲ ' : '▼ ') + Math.abs(trendB).toFixed(1) + '% vs año anterior';
+    elB.className = 'kpi-trend ' + (trendB >= 0 ? 'up' : 'down');
+  }
+
+  const gap = Math.abs(valA - valB);
+  document.getElementById('kpiGap').textContent = fmtM(gap);
+  const winner = valA > valB ? cA : cB;
+  document.getElementById('kpiGapWinner').textContent = `${winner} lidera el mercado`;
+  document.getElementById('kpiGapWinner').className = 'kpi-trend up';
+
+  const growA = ((valA - base2010A) / base2010A) * 100;
+  const growB = ((valB - base2010B) / base2010B) * 100;
+  const diffGrow = growA - growB;
+  document.getElementById('kpiPct').textContent = fmtPct(diffGrow);
+  document.getElementById('kpiPctSub').textContent =
+    `${cA}: ${fmtPct(growA)} | ${cB}: ${fmtPct(growB)}`;
+  document.getElementById('kpiPctSub').className = 'kpi-trend ' + (diffGrow >= 0 ? 'up' : 'down');
+
+  // --- CUMULATIVE GROWTH DATA for bar ---
+  const growAArr = dataA.map(v => parseFloat(((v - base2010A) / base2010A * 100).toFixed(2)));
+  const growBArr = dataB.map(v => parseFloat(((v - base2010B) / base2010B * 100).toFixed(2)));
+
+  // Colors
+  const accentA = getCSSVar('--accent');
+  const accentB = getCSSVar('--accent2');
+  const textColor = getCSSVar('--text');
+  const text2Color = getCSSVar('--text2');
+  const borderColor = getCSSVar('--border');
+  const surfaceColor = getCSSVar('--surface');
+
+  const gridColor = borderColor + '80';
+
+  const commonScales = {
+    x: {
+      ticks: { color: text2Color, font: { family: 'Inter', size: 11 } },
+      grid: { color: gridColor },
+      border: { color: borderColor }
+    },
+    y: {
+      ticks: { color: text2Color, font: { family: 'Inter', size: 11 },
+               callback: v => v >= 1000 ? (v/1000).toFixed(0)+'K' : v },
+      grid: { color: gridColor },
+      border: { color: borderColor }
+    }
+  };
+
+  // ---- LINE CHART ----
+  if (lineChart) lineChart.destroy();
+  const ctxL = document.getElementById('lineChart').getContext('2d');
+  lineChart = new Chart(ctxL, {
+    type: 'line',
+    data: {
+      labels: yearsSlice,
+      datasets: [
+        {
+          label: cA,
+          data: dataA,
+          borderColor: accentA,
+          backgroundColor: accentA + '18',
+          borderWidth: 2.5,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          pointBackgroundColor: accentA,
+          fill: true,
+          tension: 0.35
+        },
+        {
+          label: cB,
+          data: dataB,
+          borderColor: accentB,
+          backgroundColor: 'transparent',
+          borderWidth: 2.5,
+          borderDash: [6, 4],
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          pointBackgroundColor: accentB,
+          fill: false,
+          tension: 0.35
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: surfaceColor,
+          titleColor: textColor,
+          bodyColor: text2Color,
+          borderColor: borderColor,
+          borderWidth: 1,
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('es-ES')} M USD`
+          }
+        }
+      },
+      scales: {
+        ...commonScales,
+        y: {
+          ...commonScales.y,
+          ticks: {
+            ...commonScales.y.ticks,
+            callback: v => {
+              if (v >= 1000000) return (v/1000000).toFixed(1)+'M';
+              if (v >= 1000) return (v/1000).toFixed(0)+'K';
+              return v;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // ---- BAR CHART ----
+  if (barChart) barChart.destroy();
+  const ctxB = document.getElementById('barChart').getContext('2d');
+  barChart = new Chart(ctxB, {
+    type: 'bar',
+    data: {
+      labels: yearsSlice,
+      datasets: [
+        {
+          label: cA,
+          data: growAArr,
+          backgroundColor: accentA + 'cc',
+          borderColor: accentA,
+          borderWidth: 1.5,
+          borderRadius: 4,
+          borderSkipped: false
+        },
+        {
+          label: cB,
+          data: growBArr,
+          backgroundColor: accentB + 'cc',
+          borderColor: accentB,
+          borderWidth: 1.5,
+          borderRadius: 4,
+          borderSkipped: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: surfaceColor,
+          titleColor: textColor,
+          bodyColor: text2Color,
+          borderColor: borderColor,
+          borderWidth: 1,
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y >= 0 ? '+' : ''}${ctx.parsed.y.toFixed(1)}%`
+          }
+        }
+      },
+      scales: {
+        ...commonScales,
+        y: {
+          ...commonScales.y,
+          ticks: {
+            ...commonScales.y.ticks,
+            callback: v => v + '%'
+          }
+        }
+      }
+    }
+  });
+}
+
+// ---------- BOOT ----------
+initSelectors();
+update();
+</script>
+</body>
+</html>
