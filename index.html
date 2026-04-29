@@ -57,6 +57,7 @@
       box-shadow: var(--card-shadow);
     }
     .header-left { display: flex; align-items: center; gap: 14px; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
     .logo {
       width: 38px; height: 38px;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -80,6 +81,22 @@
       display: flex; align-items: center; gap: 7px;
     }
     .theme-btn:hover { background: var(--border); transform: scale(1.03); }
+    .download-btn {
+      background: linear-gradient(135deg, var(--accent), #6366f1);
+      border: none;
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      transition: opacity 0.2s, transform 0.1s;
+      display: flex; align-items: center; gap: 7px;
+      box-shadow: 0 2px 10px rgba(79,142,247,0.35);
+    }
+    .download-btn:hover { opacity: 0.88; transform: scale(1.03); }
+    .download-btn:active { transform: scale(0.98); }
 
     /* MAIN */
     main { max-width: 1280px; margin: 0 auto; padding: 28px 24px 48px; }
@@ -254,6 +271,26 @@
     }
     .chart-wrap { position: relative; height: 260px; }
 
+    /* TOAST */
+    #toast {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      background: var(--green);
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+
     /* FOOTER */
     footer {
       text-align: center;
@@ -270,12 +307,14 @@
       .kpi-grid { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 600px) {
-      header { padding: 0 16px; }
+      header { padding: 0 12px; height: auto; flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+      .header-right { width: 100%; justify-content: flex-end; }
       main { padding: 16px 12px 40px; }
       .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
       .filters-card { flex-direction: column; align-items: stretch; }
       .filter-info { text-align: left; margin-left: 0; }
       .kpi-value { font-size: 18px; }
+      .download-btn span.btn-label { display: none; }
     }
   </style>
 </head>
@@ -289,10 +328,15 @@
       <div class="header-sub">Direct Gross Premiums · Benchmarking Comparativo</div>
     </div>
   </div>
-  <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">
-    <span id="themeIcon">☀️</span>
-    <span id="themeLabel">Modo Claro</span>
-  </button>
+  <div class="header-right">
+    <button class="download-btn" onclick="downloadCSV()">
+      ⬇️ <span class="btn-label">Descargar datos</span>
+    </button>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">
+      <span id="themeIcon">☀️</span>
+      <span id="themeLabel">Modo Claro</span>
+    </button>
+  </div>
 </header>
 
 <main>
@@ -391,8 +435,11 @@
 </main>
 
 <footer>
-  OECD Insurance Statistics · Direct Gross Premiums · Valores en millones USD · Dashboard v1.0 · 2025
+  OECD Insurance Statistics · Direct Gross Premiums · Valores en millones USD · Dashboard v1.1 · 2025
 </footer>
+
+<!-- Toast notification -->
+<div id="toast">✅ Datos descargados correctamente</div>
 
 <script>
 // =========================================================
@@ -451,26 +498,17 @@ function initSelectors() {
   const selA = document.getElementById('selA');
   const selB = document.getElementById('selB');
   const selY = document.getElementById('selYear');
-
   COUNTRIES.forEach(c => {
     selA.add(new Option(c, c));
     selB.add(new Option(c, c));
   });
-
-  // Defaults
   selA.value = "Spain";
   selB.value = "Germany";
-
   YEARS.forEach(y => selY.add(new Option(y, y)));
   selY.value = "2022";
 }
 
 // ---------- FORMAT ----------
-function fmt(v) {
-  if (v >= 1000000) return (v/1000000).toFixed(2) + 'T';
-  if (v >= 1000) return (v/1000).toFixed(1) + 'K';
-  return v.toLocaleString('es-ES');
-}
 function fmtM(v) {
   return v.toLocaleString('es-ES', {maximumFractionDigits:0}) + ' M';
 }
@@ -488,6 +526,62 @@ function toggleTheme() {
   update();
 }
 
+// ---------- TOAST ----------
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ---------- DOWNLOAD CSV ----------
+function downloadCSV() {
+  const cA = document.getElementById('selA').value;
+  const cB = document.getElementById('selB').value;
+  const year = parseInt(document.getElementById('selYear').value);
+  const yearIdx = YEARS.indexOf(year);
+  const yearsSlice = YEARS.slice(0, yearIdx + 1);
+
+  const base2010A = DB[cA][0];
+  const base2010B = DB[cB][0];
+
+  // Header
+  let rows = [];
+  rows.push([
+    'Año',
+    `${cA} (USD M)`,
+    `${cB} (USD M)`,
+    `${cA} Crec. Acum. %`,
+    `${cB} Crec. Acum. %`,
+    'Brecha Absoluta (USD M)',
+    'Diferencial %'
+  ].join(','));
+
+  yearsSlice.forEach((y, i) => {
+    const vA = DB[cA][i];
+    const vB = DB[cB][i];
+    const gA = ((vA - base2010A) / base2010A * 100).toFixed(2);
+    const gB = ((vB - base2010B) / base2010B * 100).toFixed(2);
+    const gap = Math.abs(vA - vB);
+    const diff = (parseFloat(gA) - parseFloat(gB)).toFixed(2);
+    rows.push([y, vA, vB, gA, gB, gap, diff].join(','));
+  });
+
+  // BOM for Excel UTF-8 compatibility
+  const bom = '\uFEFF';
+  const csvContent = bom + rows.join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `OECD_Insurance_${cA}_vs_${cB}_${year}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`✅ Descargado: OECD_Insurance_${cA}_vs_${cB}_${year}.csv`);
+}
+
 // ---------- COLORS ----------
 function getCSSVar(name) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -501,7 +595,6 @@ function update() {
   const errDiv = document.getElementById('error-msg');
   const errTxt = document.getElementById('error-text');
 
-  // Validation
   if (!cA || !cB) {
     errTxt.textContent = 'Por favor selecciona ambos países.';
     errDiv.style.display = 'block';
@@ -518,7 +611,6 @@ function update() {
   const yearsSlice = YEARS.slice(0, yearIdx + 1);
   const dataA = DB[cA].slice(0, yearIdx + 1);
   const dataB = DB[cB].slice(0, yearIdx + 1);
-
   const valA = DB[cA][yearIdx];
   const valB = DB[cB][yearIdx];
   const base2010A = DB[cA][0];
@@ -529,13 +621,11 @@ function update() {
   document.getElementById('kpiAYear').textContent = `${cA} · ${year}`;
   document.getElementById('legA').textContent = cA;
   document.getElementById('legA2').textContent = cA;
-
   document.getElementById('kpiB').textContent = fmtM(valB);
   document.getElementById('kpiBYear').textContent = `${cB} · ${year}`;
   document.getElementById('legB').textContent = cB;
   document.getElementById('legB2').textContent = cB;
 
-  // YoY trend
   if (yearIdx > 0) {
     const trendA = ((DB[cA][yearIdx] - DB[cA][yearIdx-1]) / DB[cA][yearIdx-1]) * 100;
     const trendB = ((DB[cB][yearIdx] - DB[cB][yearIdx-1]) / DB[cB][yearIdx-1]) * 100;
@@ -561,18 +651,15 @@ function update() {
     `${cA}: ${fmtPct(growA)} | ${cB}: ${fmtPct(growB)}`;
   document.getElementById('kpiPctSub').className = 'kpi-trend ' + (diffGrow >= 0 ? 'up' : 'down');
 
-  // --- CUMULATIVE GROWTH DATA for bar ---
   const growAArr = dataA.map(v => parseFloat(((v - base2010A) / base2010A * 100).toFixed(2)));
   const growBArr = dataB.map(v => parseFloat(((v - base2010B) / base2010B * 100).toFixed(2)));
 
-  // Colors
   const accentA = getCSSVar('--accent');
   const accentB = getCSSVar('--accent2');
   const textColor = getCSSVar('--text');
   const text2Color = getCSSVar('--text2');
   const borderColor = getCSSVar('--border');
   const surfaceColor = getCSSVar('--surface');
-
   const gridColor = borderColor + '80';
 
   const commonScales = {
@@ -582,14 +669,13 @@ function update() {
       border: { color: borderColor }
     },
     y: {
-      ticks: { color: text2Color, font: { family: 'Inter', size: 11 },
-               callback: v => v >= 1000 ? (v/1000).toFixed(0)+'K' : v },
+      ticks: { color: text2Color, font: { family: 'Inter', size: 11 } },
       grid: { color: gridColor },
       border: { color: borderColor }
     }
   };
 
-  // ---- LINE CHART ----
+  // LINE CHART
   if (lineChart) lineChart.destroy();
   const ctxL = document.getElementById('lineChart').getContext('2d');
   lineChart = new Chart(ctxL, {
@@ -658,7 +744,7 @@ function update() {
     }
   });
 
-  // ---- BAR CHART ----
+  // BAR CHART
   if (barChart) barChart.destroy();
   const ctxB = document.getElementById('barChart').getContext('2d');
   barChart = new Chart(ctxB, {
@@ -717,7 +803,7 @@ function update() {
   });
 }
 
-// ---------- BOOT ----------
+// BOOT
 initSelectors();
 update();
 </script>
