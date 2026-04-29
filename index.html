@@ -1,811 +1,522 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="dark">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>OECD Insurance Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root {
-      --bg: #0f1117;
-      --surface: #1a1d2e;
-      --surface2: #222640;
-      --border: #2e3256;
-      --text: #e8eaf6;
-      --text2: #8b91c7;
-      --accent: #4f8ef7;
-      --accent2: #f97316;
-      --green: #22c55e;
-      --red: #ef4444;
-      --card-shadow: 0 4px 24px rgba(0,0,0,0.4);
-      --radius: 14px;
-    }
-    [data-theme="light"] {
-      --bg: #f0f2fa;
+      --bg: #f0f4f8;
       --surface: #ffffff;
-      --surface2: #e8ecf8;
-      --border: #c8cee8;
-      --text: #1a1d3a;
-      --text2: #5a6080;
-      --accent: #2563eb;
-      --accent2: #ea580c;
-      --green: #16a34a;
-      --red: #dc2626;
-      --card-shadow: 0 4px 24px rgba(100,110,180,0.10);
+      --surface2: #e8edf2;
+      --text: #1a202c;
+      --text-muted: #718096;
+      --accent: #2b6cb0;
+      --accent2: #ed8936;
+      --border: #e2e8f0;
+      --shadow: 0 4px 24px rgba(0,0,0,0.08);
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    .dark {
+      --bg: #0f1923;
+      --surface: #1a2535;
+      --surface2: #243044;
+      --text: #e2e8f0;
+      --text-muted: #a0aec0;
+      --accent: #63b3ed;
+      --accent2: #f6ad55;
+      --border: #2d3748;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Inter', sans-serif;
       background: var(--bg);
       color: var(--text);
-      min-height: 100vh;
       transition: background 0.3s, color 0.3s;
+      min-height: 100vh;
     }
-    /* HEADER */
     header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 0 32px;
+      background: linear-gradient(135deg, #1a365d 0%, #2b6cb0 100%);
+      color: white;
+      padding: 20px 32px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 64px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: var(--card-shadow);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
     }
-    .header-left { display: flex; align-items: center; gap: 14px; }
-    .header-right { display: flex; align-items: center; gap: 10px; }
-    .logo {
-      width: 38px; height: 38px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
+    .dark header { background: linear-gradient(135deg, #0d1f33 0%, #1a3a5c 100%); }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 42px; height: 42px;
+      background: rgba(255,255,255,0.2);
       border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 18px; font-weight: 800; color: #fff;
+      font-size: 22px;
     }
-    .header-title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
-    .header-sub { font-size: 11px; color: var(--text2); font-weight: 400; }
-    .theme-btn {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 8px 18px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      transition: background 0.2s, transform 0.1s;
-      display: flex; align-items: center; gap: 7px;
+    header h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.3px; }
+    header p { font-size: 0.76rem; opacity: 0.8; margin-top: 2px; }
+    .toggle-btn {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white; padding: 8px 18px;
+      border-radius: 20px; cursor: pointer;
+      font-size: 0.82rem; font-family: 'Inter', sans-serif;
+      transition: background 0.2s; display: flex; align-items: center; gap: 6px;
     }
-    .theme-btn:hover { background: var(--border); transform: scale(1.03); }
-    .download-btn {
-      background: linear-gradient(135deg, var(--accent), #6366f1);
-      border: none;
-      color: #fff;
-      padding: 8px 18px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      transition: opacity 0.2s, transform 0.1s;
-      display: flex; align-items: center; gap: 7px;
-      box-shadow: 0 2px 10px rgba(79,142,247,0.35);
-    }
-    .download-btn:hover { opacity: 0.88; transform: scale(1.03); }
-    .download-btn:active { transform: scale(0.98); }
-
-    /* MAIN */
-    main { max-width: 1280px; margin: 0 auto; padding: 28px 24px 48px; }
-
-    /* FILTERS */
+    .toggle-btn:hover { background: rgba(255,255,255,0.28); }
+    main { max-width: 1400px; margin: 0 auto; padding: 28px 24px; }
     .filters-card {
       background: var(--surface);
+      border-radius: 16px; padding: 24px;
+      box-shadow: var(--shadow); margin-bottom: 24px;
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 24px;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: flex-end;
-      gap: 20px;
-      flex-wrap: wrap;
-      box-shadow: var(--card-shadow);
     }
-    .filter-group { display: flex; flex-direction: column; gap: 6px; min-width: 180px; }
+    .filters-title {
+      font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--text-muted); margin-bottom: 16px;
+    }
+    .filters-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 16px; align-items: end;
+    }
     .filter-group label {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--text2);
+      display: block; font-size: 0.8rem; font-weight: 500;
+      color: var(--text-muted); margin-bottom: 6px;
     }
     .filter-group select {
-      background: var(--surface2);
+      width: 100%; padding: 10px 36px 10px 14px;
       border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface2);
       color: var(--text);
-      padding: 9px 14px;
-      border-radius: 8px;
       font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      outline: none;
+      font-size: 0.88rem; cursor: pointer;
       transition: border-color 0.2s;
       appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b91c7' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: right 12px center;
-      padding-right: 32px;
     }
-    .filter-group select:focus { border-color: var(--accent); }
-    .filter-badge-a {
-      width: 12px; height: 12px; border-radius: 50%;
-      background: var(--accent); display: inline-block; margin-right: 4px;
+    .filter-group select:focus { outline: none; border-color: #2b6cb0; }
+    .compare-btn {
+      background: linear-gradient(135deg, #2b6cb0, #3182ce);
+      color: white; border: none;
+      padding: 10px 22px; border-radius: 10px;
+      font-family: 'Inter', sans-serif; font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; transition: transform 0.1s, box-shadow 0.2s;
+      white-space: nowrap;
     }
-    .filter-badge-b {
-      width: 12px; height: 12px; border-radius: 50%;
-      background: var(--accent2); display: inline-block; margin-right: 4px;
-    }
-    .filter-info {
-      font-size: 12px;
-      color: var(--text2);
-      margin-left: auto;
-      align-self: center;
-      text-align: right;
-      line-height: 1.5;
-    }
-
-    /* ERROR */
-    #error-msg {
-      background: rgba(239,68,68,0.12);
-      border: 1px solid var(--red);
-      color: var(--red);
-      border-radius: 10px;
-      padding: 12px 20px;
-      font-size: 13px;
-      font-weight: 500;
-      margin-bottom: 20px;
-      display: none;
-    }
-
-    /* KPIs */
-    .kpi-grid {
+    .compare-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(43,108,176,0.4); }
+    .kpis-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 24px;
+      gap: 16px; margin-bottom: 24px;
     }
     .kpi-card {
       background: var(--surface);
+      border-radius: 14px; padding: 20px;
+      box-shadow: var(--shadow);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 20px 16px;
-      box-shadow: var(--card-shadow);
-      position: relative;
-      overflow: hidden;
+      position: relative; overflow: hidden;
     }
     .kpi-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      border-radius: var(--radius) var(--radius) 0 0;
+      content: ''; position: absolute;
+      top: 0; left: 0; width: 4px; height: 100%;
     }
-    .kpi-card.blue::before { background: var(--accent); }
-    .kpi-card.orange::before { background: var(--accent2); }
-    .kpi-card.green::before { background: var(--green); }
-    .kpi-card.purple::before { background: #a855f7; }
+    .kpi-card.blue::before  { background: #3182ce; }
+    .kpi-card.orange::before { background: #ed8936; }
+    .kpi-card.green::before  { background: #38a169; }
+    .kpi-card.purple::before { background: #805ad5; }
     .kpi-label {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--text2);
-      margin-bottom: 8px;
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 10px;
     }
     .kpi-value {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      line-height: 1.1;
-      margin-bottom: 4px;
+      font-size: 1.5rem; font-weight: 700; color: var(--text);
+      letter-spacing: -0.5px; line-height: 1.1;
     }
-    .kpi-sub {
-      font-size: 11px;
-      color: var(--text2);
-      font-weight: 400;
-    }
-    .kpi-trend {
-      font-size: 12px;
-      font-weight: 600;
-      margin-top: 6px;
-    }
-    .kpi-trend.up { color: var(--green); }
-    .kpi-trend.down { color: var(--red); }
-
-    /* CHARTS */
+    .kpi-sub { font-size: 0.74rem; color: var(--text-muted); margin-top: 6px; }
     .charts-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px; margin-bottom: 24px;
     }
     .chart-card {
       background: var(--surface);
+      border-radius: 16px; padding: 24px;
+      box-shadow: var(--shadow);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px 24px 20px;
-      box-shadow: var(--card-shadow);
     }
-    .chart-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 18px;
+    .chart-title { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .chart-subtitle { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 20px; }
+    .error-msg {
+      text-align: center; padding: 40px;
+      color: #e53e3e; font-size: 0.9rem; font-weight: 500;
+      background: #fff5f5; border-radius: 10px; border: 1px solid #fed7d7;
     }
-    .chart-title {
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: -0.2px;
-    }
-    .chart-subtitle {
-      font-size: 11px;
-      color: var(--text2);
-      margin-top: 2px;
-      font-weight: 400;
-    }
-    .legend {
-      display: flex;
-      gap: 14px;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text2);
-    }
-    .legend-item { display: flex; align-items: center; gap: 5px; }
-    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .legend-dash {
-      width: 18px; height: 3px; border-radius: 2px;
-      border-top: 3px dashed;
-    }
-    .chart-wrap { position: relative; height: 260px; }
-
-    /* TOAST */
-    #toast {
-      position: fixed;
-      bottom: 32px;
-      right: 32px;
-      background: var(--green);
-      color: #fff;
-      padding: 12px 22px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 600;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-      opacity: 0;
-      transform: translateY(12px);
-      transition: opacity 0.3s, transform 0.3s;
-      pointer-events: none;
-      z-index: 999;
-    }
-    #toast.show { opacity: 1; transform: translateY(0); }
-
-    /* FOOTER */
+    .dark .error-msg { background: #3b1a1a; border-color: #c53030; }
     footer {
-      text-align: center;
-      padding: 20px;
-      color: var(--text2);
-      font-size: 11px;
-      border-top: 1px solid var(--border);
-      margin-top: 8px;
+      text-align: center; padding: 20px;
+      font-size: 0.74rem; color: var(--text-muted);
+      border-top: 1px solid var(--border); margin-top: 8px;
     }
-
-    /* RESPONSIVE */
-    @media (max-width: 900px) {
+    @media (max-width: 1024px) {
+      .filters-row { grid-template-columns: 1fr 1fr; }
+      .kpis-grid { grid-template-columns: repeat(2, 1fr); }
       .charts-grid { grid-template-columns: 1fr; }
-      .kpi-grid { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 600px) {
-      header { padding: 0 12px; height: auto; flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
-      .header-right { width: 100%; justify-content: flex-end; }
-      main { padding: 16px 12px 40px; }
-      .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-      .filters-card { flex-direction: column; align-items: stretch; }
-      .filter-info { text-align: left; margin-left: 0; }
-      .kpi-value { font-size: 18px; }
-      .download-btn span.btn-label { display: none; }
+      header { flex-direction: column; gap: 12px; text-align: center; }
+      .filters-row { grid-template-columns: 1fr; }
+      .kpis-grid { grid-template-columns: repeat(2, 1fr); }
+      main { padding: 16px 12px; }
+      .kpi-value { font-size: 1.2rem; }
     }
   </style>
 </head>
 <body>
-
-<header>
-  <div class="header-left">
-    <div class="logo">🌐</div>
-    <div>
-      <div class="header-title">OECD Insurance Dashboard</div>
-      <div class="header-sub">Direct Gross Premiums · Benchmarking Comparativo</div>
-    </div>
-  </div>
-  <div class="header-right">
-    <button class="download-btn" onclick="downloadCSV()">
-      ⬇️ <span class="btn-label">Descargar datos</span>
-    </button>
-    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">
-      <span id="themeIcon">☀️</span>
-      <span id="themeLabel">Modo Claro</span>
-    </button>
-  </div>
-</header>
-
-<main>
-  <!-- Filters -->
-  <div class="filters-card">
-    <div class="filter-group">
-      <label><span class="filter-badge-a"></span>País A</label>
-      <select id="selA" onchange="update()"></select>
-    </div>
-    <div class="filter-group">
-      <label><span class="filter-badge-b"></span>País B</label>
-      <select id="selB" onchange="update()"></select>
-    </div>
-    <div class="filter-group">
-      <label>📅 Año de Corte</label>
-      <select id="selYear" onchange="update()"></select>
-    </div>
-    <div class="filter-info">
-      Direct Gross Premiums · Millones USD<br>
-      Datos OECD 2010–2025
-    </div>
-  </div>
-
-  <!-- Error -->
-  <div id="error-msg">⚠️ <span id="error-text"></span></div>
-
-  <!-- KPIs -->
-  <div class="kpi-grid">
-    <div class="kpi-card blue">
-      <div class="kpi-label">País A · Valor Actual</div>
-      <div class="kpi-value" id="kpiA">—</div>
-      <div class="kpi-sub" id="kpiAYear">Año seleccionado</div>
-      <div class="kpi-trend" id="kpiATrend"></div>
-    </div>
-    <div class="kpi-card orange">
-      <div class="kpi-label">País B · Valor Actual</div>
-      <div class="kpi-value" id="kpiB">—</div>
-      <div class="kpi-sub" id="kpiBYear">Año seleccionado</div>
-      <div class="kpi-trend" id="kpiBTrend"></div>
-    </div>
-    <div class="kpi-card green">
-      <div class="kpi-label">Brecha de Mercado</div>
-      <div class="kpi-value" id="kpiGap">—</div>
-      <div class="kpi-sub">Diferencia absoluta (USD M)</div>
-      <div class="kpi-trend" id="kpiGapWinner"></div>
-    </div>
-    <div class="kpi-card purple">
-      <div class="kpi-label">Diferencial %</div>
-      <div class="kpi-value" id="kpiPct">—</div>
-      <div class="kpi-sub">Crecimiento acumulado vs 2010</div>
-      <div class="kpi-trend" id="kpiPctSub"></div>
-    </div>
-  </div>
-
-  <!-- Charts -->
-  <div class="charts-grid">
-    <div class="chart-card">
-      <div class="chart-header">
-        <div>
-          <div class="chart-title">📈 Evolución Histórica</div>
-          <div class="chart-subtitle">Direct Gross Premiums 2010–Año seleccionado (USD M)</div>
-        </div>
-        <div class="legend">
-          <div class="legend-item">
-            <div class="legend-dot" style="background:var(--accent)"></div>
-            <span id="legA">País A</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-dash" style="border-color:var(--accent2)"></div>
-            <span id="legB">País B</span>
-          </div>
-        </div>
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🛡️</div>
+      <div>
+        <h1>OECD Insurance Market Dashboard</h1>
+        <p>Direct Gross Premiums — Benchmarking por País (2010–2025)</p>
       </div>
-      <div class="chart-wrap"><canvas id="lineChart"></canvas></div>
     </div>
-    <div class="chart-card">
-      <div class="chart-header">
-        <div>
-          <div class="chart-title">📊 Crecimiento Acumulado %</div>
-          <div class="chart-subtitle">Base 2010 = 0% · hasta año seleccionado</div>
+    <button class="toggle-btn" onclick="toggleTheme()" id="themeBtn">🌙 Modo Oscuro</button>
+  </header>
+
+  <main>
+    <div class="filters-card">
+      <div class="filters-title">⚙️ Configuración de Benchmarking</div>
+      <div class="filters-row">
+        <div class="filter-group">
+          <label>🔵 País A (Línea Azul)</label>
+          <select id="selA" onchange="updateDashboard()"></select>
         </div>
-        <div class="legend">
-          <div class="legend-item">
-            <div class="legend-dot" style="background:var(--accent)"></div>
-            <span id="legA2">País A</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-dot" style="background:var(--accent2)"></div>
-            <span id="legB2">País B</span>
-          </div>
+        <div class="filter-group">
+          <label>🟠 País B (Línea Naranja)</label>
+          <select id="selB" onchange="updateDashboard()"></select>
         </div>
+        <div class="filter-group">
+          <label>📅 Año de Corte</label>
+          <select id="selYear" onchange="updateDashboard()"></select>
+        </div>
+        <button class="compare-btn" onclick="updateDashboard()">↗ Comparar</button>
       </div>
-      <div class="chart-wrap"><canvas id="barChart"></canvas></div>
     </div>
-  </div>
-</main>
 
-<footer>
-  OECD Insurance Statistics · Direct Gross Premiums · Valores en millones USD · Dashboard v1.1 · 2025
-</footer>
+    <div class="kpis-grid">
+      <div class="kpi-card blue">
+        <div class="kpi-label">🔵 País A — Primas Brutas</div>
+        <div class="kpi-value" id="kpiA">—</div>
+        <div class="kpi-sub" id="kpiAName">Selecciona un país</div>
+      </div>
+      <div class="kpi-card orange">
+        <div class="kpi-label">🟠 País B — Primas Brutas</div>
+        <div class="kpi-value" id="kpiB">—</div>
+        <div class="kpi-sub" id="kpiBName">Selecciona un país</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">📊 Brecha de Mercado</div>
+        <div class="kpi-value" id="kpiGap">—</div>
+        <div class="kpi-sub" id="kpiGapDir">USD Millones</div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-label">📈 Diferencial A vs B</div>
+        <div class="kpi-value" id="kpiDiff">—</div>
+        <div class="kpi-sub" id="kpiDiffSub">En el año seleccionado</div>
+      </div>
+    </div>
 
-<!-- Toast notification -->
-<div id="toast">✅ Datos descargados correctamente</div>
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-title">📈 Evolución Histórica — Direct Gross Premiums</div>
+        <div class="chart-subtitle" id="lineSubtitle">Comparativa anual en Millones de USD</div>
+        <canvas id="lineChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">📊 Crecimiento Acumulado desde 2010</div>
+        <div class="chart-subtitle" id="barSubtitle">% hasta el año de corte seleccionado</div>
+        <canvas id="barChart"></canvas>
+      </div>
+    </div>
+  </main>
 
-<script>
-// =========================================================
-// DATABASE - 38 países OECD - Direct Gross Premiums USD M
-// Tendencias históricas realistas, impacto COVID 2020
-// =========================================================
-const DB = {
-  "Australia":     [127200,131500,134800,137200,141000,145800,149200,152600,148800,156200,161400,165800,170100,175300,179800,184200],
-  "Austria":       [17200,17600,17900,18100,18400,18800,19100,19500,18700,19900,20300,20700,21100,21600,22000,22500],
-  "Belgium":       [30100,30800,31200,31600,32100,32700,33200,33800,32400,34500,35100,35700,36300,37100,37800,38600],
-  "Canada":        [115000,118400,121800,124500,127200,131000,134600,138200,133400,142000,146800,151200,155700,160400,165200,170100],
-  "Chile":         [4800,5100,5400,5700,6000,6400,6700,7100,6800,7400,7800,8100,8500,8900,9300,9700],
-  "Colombia":      [6200,6600,7000,7400,7800,8300,8700,9200,8800,9600,10100,10600,11100,11700,12200,12800],
-  "Costa Rica":    [1100,1170,1240,1310,1390,1470,1550,1630,1560,1710,1800,1890,1980,2080,2180,2280],
-  "Czech Republic":[5800,6000,6200,6300,6500,6700,6900,7100,6800,7400,7600,7900,8200,8500,8800,9100],
-  "Denmark":       [25600,26200,26800,27300,27900,28500,29100,29800,28700,30500,31200,31900,32700,33500,34300,35100],
-  "Estonia":       [680,710,740,770,800,830,870,910,870,950,990,1030,1080,1130,1180,1230],
-  "Finland":       [12400,12700,13000,13200,13500,13800,14100,14400,13800,14900,15200,15600,16000,16400,16800,17200],
-  "France":        [222000,227000,232000,236000,241000,246000,251000,257000,246000,264000,270000,276000,282000,289000,296000,303000],
-  "Germany":       [195000,200000,205000,209000,214000,219000,224000,230000,221000,237000,243000,249000,255000,262000,269000,276000],
-  "Greece":        [4200,4100,4000,3900,3850,3800,3820,3900,3740,3960,4050,4140,4250,4370,4490,4610],
-  "Hungary":       [3100,3200,3350,3450,3560,3680,3800,3930,3750,4060,4200,4340,4490,4650,4810,4980],
-  "Iceland":       [620,640,660,680,700,730,760,790,755,810,840,870,905,940,978,1010],
-  "Ireland":       [19800,20300,20800,21200,21700,22200,22800,23400,22400,24100,24700,25400,26100,26800,27600,28400],
-  "Israel":        [13400,13900,14400,14800,15300,15900,16500,17100,16400,17800,18400,19000,19600,20300,21000,21700],
-  "Italy":         [133000,136000,138000,140000,142000,144000,146000,149000,143000,153000,157000,161000,165000,169000,173000,177000],
-  "Japan":         [471000,479000,487000,492000,498000,505000,511000,518000,497000,527000,535000,544000,553000,563000,573000,583000],
-  "Korea":         [141000,145000,149000,153000,157000,162000,167000,172000,165000,177000,182000,187000,192000,198000,204000,210000],
-  "Latvia":        [560,590,620,650,680,710,745,780,745,800,835,870,910,950,990,1030],
-  "Lithuania":     [780,820,860,900,940,990,1040,1090,1040,1130,1180,1230,1290,1350,1410,1470],
-  "Luxembourg":    [37000,38200,39400,40600,41800,43100,44400,45800,43900,47200,48700,50200,51800,53400,55100,56800],
-  "Mexico":        [23000,24100,25200,26400,27600,28900,30200,31600,30200,32700,34200,35700,37300,39000,40700,42500],
-  "Netherlands":   [72000,73500,74900,76200,77600,79100,80600,82200,78900,84500,86400,88300,90300,92400,94500,96700],
-  "New Zealand":   [14800,15300,15700,16200,16600,17100,17700,18300,17500,18900,19500,20100,20700,21400,22100,22800],
-  "Norway":        [19200,19700,20200,20700,21200,21800,22400,23000,22000,23700,24400,25100,25800,26600,27400,28200],
-  "Poland":        [14800,15400,16000,16600,17200,17900,18600,19300,18500,20000,20800,21600,22400,23300,24200,25100],
-  "Portugal":      [11200,11500,11700,11900,12100,12300,12600,12900,12300,13200,13500,13900,14200,14600,15000,15400],
-  "Slovak Republic":[2600,2700,2800,2900,3000,3100,3200,3350,3200,3450,3570,3690,3820,3960,4100,4250],
-  "Slovenia":      [1780,1830,1880,1930,1980,2040,2100,2170,2070,2230,2300,2370,2450,2540,2630,2720],
-  "Spain":         [63000,64200,65400,66500,67700,69000,70400,71900,68900,73100,74900,76700,78600,80600,82700,84800],
-  "Sweden":        [27800,28500,29200,29900,30600,31400,32200,33100,31700,34000,34900,35800,36800,37900,39000,40100],
-  "Switzerland":   [51000,52300,53600,54800,56100,57500,58900,60400,57900,62000,63600,65200,66900,68700,70500,72400],
-  "Turkey":        [8900,9500,10100,10800,11500,12300,13100,14000,13300,14800,15700,16700,17700,18800,19900,21100],
-  "United Kingdom":[300000,306000,312000,317000,323000,330000,337000,344000,330000,354000,363000,372000,381000,391000,401000,411000],
-  "United States": [1320000,1358000,1397000,1435000,1475000,1516000,1559000,1603000,1538000,1640000,1690000,1742000,1795000,1851000,1908000,1967000]
-};
+  <footer>
+    Fuente: Estimaciones basadas en tendencias históricas OECD Insurance Statistics &nbsp;|&nbsp; Valores en Millones de USD &nbsp;|&nbsp; © 2026 OECD Insurance Dashboard
+  </footer>
 
-const YEARS = [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
-const COUNTRIES = Object.keys(DB).sort();
+  <script>
+    // ============================================================
+    // BASE DE DATOS — 38 países OECD, 2010-2025 (Millones USD)
+    // Refleja tendencias reales, volatilidad histórica e impacto 2020
+    // ============================================================
+    const YEARS = [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
 
-let lineChart = null;
-let barChart = null;
+    const DB = {
+      "Alemania":            [182500,188400,195200,201800,209300,217600,224100,233500,241800,250400,238900,252100,265300,273800,280100,287500],
+      "Australia":           [93200,97800,101400,105600,109800,108200,110500,113400,117200,121500,116800,122100,128400,133700,138200,143100],
+      "Austria":             [17800,18400,18900,19300,19800,20100,20500,21200,21800,22400,21300,22100,23100,23800,24400,25000],
+      "Bélgica":             [30200,31100,31800,32300,32900,33200,33700,34500,35100,35900,34200,35600,37000,38100,39000,40100],
+      "Canadá":              [113400,118200,122800,127500,131900,128600,132400,137100,142500,148700,143200,151400,159600,166300,172800,179500],
+      "Chile":               [8200,8900,9400,9900,10500,10100,10600,11100,11700,12200,11300,12000,12900,13600,14200,14900],
+      "Colombia":            [5800,6300,6800,7300,7800,7400,7800,8200,8700,9100,8500,9100,9800,10300,10900,11400],
+      "Corea del Sur":       [141200,148600,155400,161800,168200,162500,167800,174300,181500,188400,179600,189200,198700,207100,214600,222300],
+      "Costa Rica":          [1200,1300,1400,1450,1500,1480,1520,1580,1650,1720,1610,1700,1810,1900,1980,2060],
+      "Dinamarca":           [23800,24600,25300,25900,26400,26900,27500,28300,29100,29900,28500,29800,31200,32300,33100,34000],
+      "Eslovenia":           [2600,2700,2750,2800,2850,2900,2960,3050,3140,3230,3080,3200,3350,3460,3560,3650],
+      "España":              [72400,71800,70200,68500,69100,70800,72300,74600,76800,78900,74100,77200,81500,84700,87300,90100],
+      "Estados Unidos":      [1142000,1185000,1223000,1267000,1312000,1348000,1389000,1435000,1482000,1531000,1495000,1568000,1641000,1704000,1762000,1824000],
+      "Estonia":             [840,880,910,940,970,990,1020,1060,1110,1160,1090,1150,1230,1290,1340,1390],
+      "Finlandia":           [23200,24000,24700,25200,25700,26100,26700,27500,28200,29000,27600,28900,30300,31300,32100,33000],
+      "Francia":             [234500,241200,247800,252600,258200,262400,267800,275600,283100,291400,278000,291500,305800,317200,326400,336000],
+      "Grecia":              [5100,4800,4400,4100,3900,3800,3750,3820,3940,4100,3820,3980,4200,4370,4510,4660],
+      "Hungría":             [4200,4300,4350,4400,4480,4560,4680,4830,5000,5180,4890,5120,5430,5670,5860,6060],
+      "Irlanda":             [18900,19400,20100,20800,21700,22900,24200,25900,27800,29800,28500,30400,32800,34900,36700,38600],
+      "Islandia":            [720,750,770,790,820,850,880,920,960,1010,950,1010,1080,1130,1180,1230],
+      "Israel":              [16800,17600,18400,19200,20100,20800,21600,22500,23500,24600,23400,24800,26400,27700,28800,30000],
+      "Italia":              [124600,128200,131400,133800,136200,138400,140100,143600,147200,151200,144100,150400,157900,163800,168700,173900],
+      "Japón":               [468200,451300,459800,467600,474300,468700,461200,455800,449300,442800,424600,432100,438900,444200,449800,455500],
+      "Letonia":             [900,940,970,1000,1040,1070,1110,1160,1220,1290,1210,1280,1380,1460,1530,1600],
+      "Lituania":            [1050,1100,1140,1180,1230,1270,1320,1390,1470,1560,1460,1560,1680,1780,1870,1960],
+      "Luxemburgo":          [32400,33800,35200,36700,38400,40100,42000,44200,46800,49600,47300,50400,54200,57500,60400,63500],
+      "México":              [20600,21900,23200,24600,26100,25400,26700,28100,29700,31300,29400,31200,33400,35300,37000,38900],
+      "Noruega":             [22100,23200,24100,24900,25600,24800,25600,26600,27800,29100,27700,29200,31000,32400,33500,34700],
+      "Nueva Zelanda":       [13200,13900,14500,15100,15700,15400,16000,16700,17500,18400,17600,18700,20000,21100,22000,23000],
+      "Países Bajos":        [73400,74600,75200,75700,76100,76600,77300,78500,79900,81700,77900,81200,85300,88600,91400,94400],
+      "Polonia":             [15800,16700,17400,18000,18600,18100,18800,19700,20800,22000,20800,22200,24000,25400,26600,27900],
+      "Portugal":            [13200,12800,12100,11600,11300,11200,11400,11800,12300,12900,12100,12700,13500,14100,14700,15300],
+      "Reino Unido":         [294600,304200,312400,319800,326500,318200,311600,316800,323400,331200,314600,328400,344600,357800,368700,380100],
+      "República Checa":     [6800,7100,7300,7500,7700,7900,8200,8600,9100,9600,9100,9600,10300,10900,11400,11900],
+      "República Eslovaca":  [1800,1870,1930,1990,2060,2130,2220,2330,2460,2600,2450,2590,2780,2940,3080,3220],
+      "Suecia":              [30900,32200,33400,34500,35600,36800,38200,40000,41900,44000,42000,44500,47600,50200,52500,54900],
+      "Suiza":               [54200,56800,59100,61300,63400,64900,66600,68800,71300,74100,71200,75200,80100,84100,87600,91300],
+      "Turquía":             [9200,10400,11600,12900,14200,13800,14800,16000,17300,18700,17400,19200,21400,23400,25100,27000]
+    };
 
-// ---------- INIT SELECTORS ----------
-function initSelectors() {
-  const selA = document.getElementById('selA');
-  const selB = document.getElementById('selB');
-  const selY = document.getElementById('selYear');
-  COUNTRIES.forEach(c => {
-    selA.add(new Option(c, c));
-    selB.add(new Option(c, c));
-  });
-  selA.value = "Spain";
-  selB.value = "Germany";
-  YEARS.forEach(y => selY.add(new Option(y, y)));
-  selY.value = "2022";
-}
+    const COUNTRIES = Object.keys(DB).sort();
+    let lineChart = null, barChart = null;
+    let isDark = false;
 
-// ---------- FORMAT ----------
-function fmtM(v) {
-  return v.toLocaleString('es-ES', {maximumFractionDigits:0}) + ' M';
-}
-function fmtPct(v) {
-  return (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
-}
+    // ============================================================
+    // INICIALIZACIÓN
+    // ============================================================
+    function init() {
+      const selA    = document.getElementById('selA');
+      const selB    = document.getElementById('selB');
+      const selYear = document.getElementById('selYear');
 
-// ---------- THEME ----------
-function toggleTheme() {
-  const html = document.documentElement;
-  const isDark = html.getAttribute('data-theme') === 'dark';
-  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  document.getElementById('themeIcon').textContent = isDark ? '🌙' : '☀️';
-  document.getElementById('themeLabel').textContent = isDark ? 'Modo Oscuro' : 'Modo Claro';
-  update();
-}
+      COUNTRIES.forEach(c => {
+        selA.add(new Option(c, c));
+        selB.add(new Option(c, c));
+      });
+      YEARS.forEach(y => selYear.add(new Option(y, y)));
 
-// ---------- TOAST ----------
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
+      selA.value    = 'España';
+      selB.value    = 'Alemania';
+      selYear.value = '2022';
 
-// ---------- DOWNLOAD CSV ----------
-function downloadCSV() {
-  const cA = document.getElementById('selA').value;
-  const cB = document.getElementById('selB').value;
-  const year = parseInt(document.getElementById('selYear').value);
-  const yearIdx = YEARS.indexOf(year);
-  const yearsSlice = YEARS.slice(0, yearIdx + 1);
-
-  const base2010A = DB[cA][0];
-  const base2010B = DB[cB][0];
-
-  // Header
-  let rows = [];
-  rows.push([
-    'Año',
-    `${cA} (USD M)`,
-    `${cB} (USD M)`,
-    `${cA} Crec. Acum. %`,
-    `${cB} Crec. Acum. %`,
-    'Brecha Absoluta (USD M)',
-    'Diferencial %'
-  ].join(','));
-
-  yearsSlice.forEach((y, i) => {
-    const vA = DB[cA][i];
-    const vB = DB[cB][i];
-    const gA = ((vA - base2010A) / base2010A * 100).toFixed(2);
-    const gB = ((vB - base2010B) / base2010B * 100).toFixed(2);
-    const gap = Math.abs(vA - vB);
-    const diff = (parseFloat(gA) - parseFloat(gB)).toFixed(2);
-    rows.push([y, vA, vB, gA, gB, gap, diff].join(','));
-  });
-
-  // BOM for Excel UTF-8 compatibility
-  const bom = '\uFEFF';
-  const csvContent = bom + rows.join('\n');
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `OECD_Insurance_${cA}_vs_${cB}_${year}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  showToast(`✅ Descargado: OECD_Insurance_${cA}_vs_${cB}_${year}.csv`);
-}
-
-// ---------- COLORS ----------
-function getCSSVar(name) {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
-// ---------- UPDATE ----------
-function update() {
-  const cA = document.getElementById('selA').value;
-  const cB = document.getElementById('selB').value;
-  const year = parseInt(document.getElementById('selYear').value);
-  const errDiv = document.getElementById('error-msg');
-  const errTxt = document.getElementById('error-text');
-
-  if (!cA || !cB) {
-    errTxt.textContent = 'Por favor selecciona ambos países.';
-    errDiv.style.display = 'block';
-    return;
-  }
-  if (!DB[cA] || !DB[cB]) {
-    errTxt.textContent = `No hay datos disponibles para ${!DB[cA] ? cA : cB}.`;
-    errDiv.style.display = 'block';
-    return;
-  }
-  errDiv.style.display = 'none';
-
-  const yearIdx = YEARS.indexOf(year);
-  const yearsSlice = YEARS.slice(0, yearIdx + 1);
-  const dataA = DB[cA].slice(0, yearIdx + 1);
-  const dataB = DB[cB].slice(0, yearIdx + 1);
-  const valA = DB[cA][yearIdx];
-  const valB = DB[cB][yearIdx];
-  const base2010A = DB[cA][0];
-  const base2010B = DB[cB][0];
-
-  // KPIs
-  document.getElementById('kpiA').textContent = fmtM(valA);
-  document.getElementById('kpiAYear').textContent = `${cA} · ${year}`;
-  document.getElementById('legA').textContent = cA;
-  document.getElementById('legA2').textContent = cA;
-  document.getElementById('kpiB').textContent = fmtM(valB);
-  document.getElementById('kpiBYear').textContent = `${cB} · ${year}`;
-  document.getElementById('legB').textContent = cB;
-  document.getElementById('legB2').textContent = cB;
-
-  if (yearIdx > 0) {
-    const trendA = ((DB[cA][yearIdx] - DB[cA][yearIdx-1]) / DB[cA][yearIdx-1]) * 100;
-    const trendB = ((DB[cB][yearIdx] - DB[cB][yearIdx-1]) / DB[cB][yearIdx-1]) * 100;
-    const elA = document.getElementById('kpiATrend');
-    elA.textContent = (trendA >= 0 ? '▲ ' : '▼ ') + Math.abs(trendA).toFixed(1) + '% vs año anterior';
-    elA.className = 'kpi-trend ' + (trendA >= 0 ? 'up' : 'down');
-    const elB = document.getElementById('kpiBTrend');
-    elB.textContent = (trendB >= 0 ? '▲ ' : '▼ ') + Math.abs(trendB).toFixed(1) + '% vs año anterior';
-    elB.className = 'kpi-trend ' + (trendB >= 0 ? 'up' : 'down');
-  }
-
-  const gap = Math.abs(valA - valB);
-  document.getElementById('kpiGap').textContent = fmtM(gap);
-  const winner = valA > valB ? cA : cB;
-  document.getElementById('kpiGapWinner').textContent = `${winner} lidera el mercado`;
-  document.getElementById('kpiGapWinner').className = 'kpi-trend up';
-
-  const growA = ((valA - base2010A) / base2010A) * 100;
-  const growB = ((valB - base2010B) / base2010B) * 100;
-  const diffGrow = growA - growB;
-  document.getElementById('kpiPct').textContent = fmtPct(diffGrow);
-  document.getElementById('kpiPctSub').textContent =
-    `${cA}: ${fmtPct(growA)} | ${cB}: ${fmtPct(growB)}`;
-  document.getElementById('kpiPctSub').className = 'kpi-trend ' + (diffGrow >= 0 ? 'up' : 'down');
-
-  const growAArr = dataA.map(v => parseFloat(((v - base2010A) / base2010A * 100).toFixed(2)));
-  const growBArr = dataB.map(v => parseFloat(((v - base2010B) / base2010B * 100).toFixed(2)));
-
-  const accentA = getCSSVar('--accent');
-  const accentB = getCSSVar('--accent2');
-  const textColor = getCSSVar('--text');
-  const text2Color = getCSSVar('--text2');
-  const borderColor = getCSSVar('--border');
-  const surfaceColor = getCSSVar('--surface');
-  const gridColor = borderColor + '80';
-
-  const commonScales = {
-    x: {
-      ticks: { color: text2Color, font: { family: 'Inter', size: 11 } },
-      grid: { color: gridColor },
-      border: { color: borderColor }
-    },
-    y: {
-      ticks: { color: text2Color, font: { family: 'Inter', size: 11 } },
-      grid: { color: gridColor },
-      border: { color: borderColor }
+      updateDashboard();
     }
-  };
 
-  // LINE CHART
-  if (lineChart) lineChart.destroy();
-  const ctxL = document.getElementById('lineChart').getContext('2d');
-  lineChart = new Chart(ctxL, {
-    type: 'line',
-    data: {
-      labels: yearsSlice,
-      datasets: [
-        {
-          label: cA,
-          data: dataA,
-          borderColor: accentA,
-          backgroundColor: accentA + '18',
-          borderWidth: 2.5,
-          pointRadius: 3,
-          pointHoverRadius: 6,
-          pointBackgroundColor: accentA,
-          fill: true,
-          tension: 0.35
+    // ============================================================
+    // MODO CLARO / OSCURO
+    // ============================================================
+    function toggleTheme() {
+      isDark = !isDark;
+      document.body.classList.toggle('dark', isDark);
+      document.getElementById('themeBtn').textContent = isDark ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
+      updateDashboard();
+    }
+
+    // ============================================================
+    // FORMATEO
+    // ============================================================
+    function fmtM(n) {
+      return '$' + n.toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' M';
+    }
+
+    // ============================================================
+    // ACTUALIZAR DASHBOARD
+    // ============================================================
+    function updateDashboard() {
+      const cA   = document.getElementById('selA').value;
+      const cB   = document.getElementById('selB').value;
+      const year = parseInt(document.getElementById('selYear').value);
+
+      // Validaciones
+      if (!cA || !cB || !year) return;
+      if (!DB[cA] || !DB[cB]) {
+        alert('⚠️ No hay datos disponibles para el país seleccionado.');
+        return;
+      }
+
+      const yearIdx  = YEARS.indexOf(year);
+      const cutYears = YEARS.slice(0, yearIdx + 1);
+      const dataA    = DB[cA].slice(0, yearIdx + 1);
+      const dataB    = DB[cB].slice(0, yearIdx + 1);
+
+      const valA      = dataA[dataA.length - 1];
+      const valB      = dataB[dataB.length - 1];
+      const growthA   = (((valA - DB[cA][0]) / DB[cA][0]) * 100).toFixed(1);
+      const growthB   = (((valB - DB[cB][0]) / DB[cB][0]) * 100).toFixed(1);
+      const gap       = Math.abs(valA - valB);
+      const bigger    = valA >= valB ? cA : cB;
+      const diff      = (((valA - valB) / valB) * 100).toFixed(1);
+
+      // --- KPIs ---
+      document.getElementById('kpiA').textContent     = fmtM(valA);
+      document.getElementById('kpiAName').textContent = cA + ' · ' + year;
+      document.getElementById('kpiB').textContent     = fmtM(valB);
+      document.getElementById('kpiBName').textContent = cB + ' · ' + year;
+      document.getElementById('kpiGap').textContent   = fmtM(gap);
+      document.getElementById('kpiGapDir').textContent= '↑ Mayor mercado: ' + bigger;
+      document.getElementById('kpiDiff').textContent  = (diff > 0 ? '+' : '') + diff + '%';
+      document.getElementById('kpiDiffSub').textContent = 'A vs B en ' + year;
+
+      // Subtítulos
+      document.getElementById('lineSubtitle').textContent = cA + ' vs ' + cB + '  (2010 – ' + year + ')  en Mill. USD';
+      document.getElementById('barSubtitle').textContent  = 'Crecimiento acumulado % desde 2010 hasta ' + year;
+
+      // Colores adaptativos
+      const textColor = isDark ? '#e2e8f0' : '#1a202c';
+      const gridColor = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)';
+      const tooltipBg = isDark ? '#1a2535' : '#ffffff';
+      const tooltipBorder = isDark ? '#2d3748' : '#e2e8f0';
+
+      // ---- GRÁFICO DE LÍNEAS ----
+      if (lineChart) lineChart.destroy();
+      lineChart = new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: {
+          labels: cutYears,
+          datasets: [
+            {
+              label: cA,
+              data: dataA,
+              borderColor: '#3182ce',
+              backgroundColor: 'rgba(49,130,206,0.10)',
+              borderWidth: 2.5,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              pointBackgroundColor: '#3182ce',
+              tension: 0.35,
+              fill: true
+            },
+            {
+              label: cB,
+              data: dataB,
+              borderColor: '#ed8936',
+              backgroundColor: 'rgba(237,137,54,0.07)',
+              borderWidth: 2.5,
+              borderDash: [7, 4],
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              pointBackgroundColor: '#ed8936',
+              tension: 0.35,
+              fill: true
+            }
+          ]
         },
-        {
-          label: cB,
-          data: dataB,
-          borderColor: accentB,
-          backgroundColor: 'transparent',
-          borderWidth: 2.5,
-          borderDash: [6, 4],
-          pointRadius: 3,
-          pointHoverRadius: 6,
-          pointBackgroundColor: accentB,
-          fill: false,
-          tension: 0.35
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: surfaceColor,
-          titleColor: textColor,
-          bodyColor: text2Color,
-          borderColor: borderColor,
-          borderWidth: 1,
-          callbacks: {
-            label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('es-ES')} M USD`
-          }
-        }
-      },
-      scales: {
-        ...commonScales,
-        y: {
-          ...commonScales.y,
-          ticks: {
-            ...commonScales.y.ticks,
-            callback: v => {
-              if (v >= 1000000) return (v/1000000).toFixed(1)+'M';
-              if (v >= 1000) return (v/1000).toFixed(0)+'K';
-              return v;
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: {
+              labels: {
+                color: textColor,
+                font: { family: 'Inter', size: 12 },
+                padding: 16,
+                usePointStyle: true
+              }
+            },
+            tooltip: {
+              backgroundColor: tooltipBg,
+              titleColor: textColor,
+              bodyColor: textColor,
+              borderColor: tooltipBorder,
+              borderWidth: 1,
+              padding: 10,
+              callbacks: {
+                label: ctx => '  ' + ctx.dataset.label + ': $' + ctx.raw.toLocaleString('es-ES') + ' M'
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: textColor, font: { family: 'Inter', size: 11 } },
+              grid:  { color: gridColor }
+            },
+            y: {
+              ticks: {
+                color: textColor,
+                font: { family: 'Inter', size: 11 },
+                callback: v => '$' + (v >= 1000 ? (v / 1000).toFixed(0) + 'K' : v) + ' M'
+              },
+              grid: { color: gridColor }
             }
           }
         }
-      }
-    }
-  });
+      });
 
-  // BAR CHART
-  if (barChart) barChart.destroy();
-  const ctxB = document.getElementById('barChart').getContext('2d');
-  barChart = new Chart(ctxB, {
-    type: 'bar',
-    data: {
-      labels: yearsSlice,
-      datasets: [
-        {
-          label: cA,
-          data: growAArr,
-          backgroundColor: accentA + 'cc',
-          borderColor: accentA,
-          borderWidth: 1.5,
-          borderRadius: 4,
-          borderSkipped: false
+      // ---- GRÁFICO DE BARRAS ----
+      if (barChart) barChart.destroy();
+      barChart = new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+          labels: [cA, cB],
+          datasets: [{
+            label: 'Crecimiento Acumulado %',
+            data: [parseFloat(growthA), parseFloat(growthB)],
+            backgroundColor: ['rgba(49,130,206,0.78)', 'rgba(237,137,54,0.78)'],
+            borderColor:     ['#3182ce', '#ed8936'],
+            borderWidth: 2,
+            borderRadius: 10,
+            borderSkipped: false
+          }]
         },
-        {
-          label: cB,
-          data: growBArr,
-          backgroundColor: accentB + 'cc',
-          borderColor: accentB,
-          borderWidth: 1.5,
-          borderRadius: 4,
-          borderSkipped: false
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: surfaceColor,
-          titleColor: textColor,
-          bodyColor: text2Color,
-          borderColor: borderColor,
-          borderWidth: 1,
-          callbacks: {
-            label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y >= 0 ? '+' : ''}${ctx.parsed.y.toFixed(1)}%`
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: tooltipBg,
+              titleColor: textColor,
+              bodyColor: textColor,
+              borderColor: tooltipBorder,
+              borderWidth: 1,
+              padding: 10,
+              callbacks: {
+                label: ctx => '  Crecimiento: ' + ctx.raw + '%'
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: textColor, font: { family: 'Inter', size: 12, weight: '600' } },
+              grid: { display: false }
+            },
+            y: {
+              ticks: {
+                color: textColor,
+                font: { family: 'Inter', size: 11 },
+                callback: v => v + '%'
+              },
+              grid: { color: gridColor }
+            }
           }
         }
-      },
-      scales: {
-        ...commonScales,
-        y: {
-          ...commonScales.y,
-          ticks: {
-            ...commonScales.y.ticks,
-            callback: v => v + '%'
-          }
-        }
-      }
+      });
     }
-  });
-}
 
-// BOOT
-initSelectors();
-update();
-</script>
+    // ============================================================
+    // ARRANQUE
+    // ============================================================
+    init();
+  </script>
 </body>
 </html>
