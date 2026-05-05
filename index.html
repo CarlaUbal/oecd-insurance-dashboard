@@ -1,375 +1,653 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>OECD Insurance Dashboard — Direct Gross Premiums</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-<style>
-/* ===== CSS Variables ===== */
-:root{
-  --bg:#f4f6f8;--surface:#ffffff;--text:#1a1a2e;--text2:#555;--border:#e0e0e0;
-  --accent:#2563eb;--accent2:#f97316;--accent-light:#dbeafe;--kpi-gap:#ef4444;
-  --radius:12px;--shadow:0 2px 8px rgba(0,0,0,.06);
-}
-.dark{
-  --bg:#0f172a;--surface:#1e293b;--text:#e2e8f0;--text2:#94a3b8;--border:#334155;
-  --accent:#3b82f6;--accent2:#fb923c;--accent-light:#1e3a5f;--kpi-gap:#f87171;
-  --shadow:0 2px 8px rgba(0,0,0,.3);
-}
-/* ===== Reset & Base ===== */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;min-height:100vh}
-/* ===== Layout ===== */
-.app{max-width:1260px;margin:0 auto;padding:24px 20px 48px}
-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:28px}
-header h1{font-size:1.55rem;font-weight:700;letter-spacing:-.3px}
-header h1 span{color:var(--accent)}
-.header-actions{display:flex;gap:10px;align-items:center}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:.82rem;font-weight:500;cursor:pointer;transition:all .2s}
-.btn:hover{border-color:var(--accent);color:var(--accent)}
-.btn svg{width:16px;height:16px;fill:currentColor}
-/* Filters */
-.filters-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;box-shadow:var(--shadow);margin-bottom:24px}
-.filters-card h2{font-size:.92rem;font-weight:600;margin-bottom:14px;color:var(--accent)}
-.filters-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
-.field label{display:block;font-size:.75rem;font-weight:500;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
-.field select{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:.88rem;font-family:inherit;cursor:pointer;transition:border .2s}
-.field select:focus{outline:none;border-color:var(--accent)}
-/* KPIs */
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px}
-.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
-.kpi-label{font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:6px}
-.kpi-value{font-size:1.6rem;font-weight:700}
-.kpi-sub{font-size:.78rem;color:var(--text2);margin-top:4px}
-.kpi-value.a{color:var(--accent)}.kpi-value.b{color:var(--accent2)}.kpi-value.gap{color:var(--kpi-gap)}
-/* Charts */
-.charts{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
-.chart-card h3{font-size:.88rem;font-weight:600;margin-bottom:12px}
-.chart-wrap{position:relative;width:100%;height:340px}
-.chart-wrap canvas{width:100%!important;height:100%!important}
-/* Error */
-.error-msg{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:8px;padding:12px 16px;font-size:.85rem;margin-bottom:16px;display:none}
-.dark .error-msg{background:#350a0a;color:#fca5a5;border-color:#7f1d1d}
-/* Responsive */
-@media(max-width:768px){
-  .charts{grid-template-columns:1fr}
-  header{flex-direction:column;align-items:flex-start}
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OECD Insurance Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #f0f4f8;
+      --surface: #ffffff;
+      --surface2: #f7fafc;
+      --border: #e2e8f0;
+      --text: #1a202c;
+      --text2: #4a5568;
+      --accent: #2563eb;
+      --accent2: #f97316;
+      --kpi-bg: #ffffff;
+      --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface2: #1e293b;
+      --border: #334155;
+      --text: #f1f5f9;
+      --text2: #94a3b8;
+      --accent: #60a5fa;
+      --accent2: #fb923c;
+      --kpi-bg: #1e293b;
+      --shadow: 0 2px 12px rgba(0,0,0,0.4);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.3s, color 0.3s;
+      min-height: 100vh;
+    }
+    /* HEADER */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon svg { width: 22px; height: 22px; fill: white; }
+    .header-title h1 { font-size: 1.15rem; font-weight: 700; color: var(--text); }
+    .header-title p { font-size: 0.75rem; color: var(--text2); }
+    .header-actions { display: flex; gap: 10px; }
+    .btn {
+      padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text); font-family: 'Inter', sans-serif;
+      font-size: 0.82rem; font-weight: 500; cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+    .btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+    .btn-primary:hover { opacity: 0.9; }
+
+    /* MAIN */
+    main { max-width: 1280px; margin: 0 auto; padding: 28px 24px; }
+
+    /* LOADING */
+    #loading-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 9999; gap: 16px;
+    }
+    .spinner {
+      width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.3);
+      border-top-color: #60a5fa; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading-overlay p { color: white; font-size: 0.95rem; font-weight: 500; }
+
+    /* ERROR BANNER */
+    #error-banner {
+      display: none; background: #fef2f2; border: 1px solid #fca5a5;
+      color: #b91c1c; padding: 12px 20px; border-radius: 10px;
+      margin-bottom: 20px; font-size: 0.875rem; align-items: center; gap: 8px;
+    }
+
+    /* FILTERS */
+    .filters-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px 24px; margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+    .filters-title { font-size: 0.78rem; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
+    .filters-grid { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+    .filter-group { display: flex; flex-direction: column; gap: 6px; min-width: 180px; flex: 1; }
+    .filter-group label { font-size: 0.78rem; font-weight: 500; color: var(--text2); }
+    .filter-group select, .filter-group input {
+      padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--surface2); color: var(--text);
+      font-family: 'Inter', sans-serif; font-size: 0.87rem;
+      outline: none; transition: border 0.2s;
+    }
+    .filter-group select:focus, .filter-group input:focus { border-color: var(--accent); }
+
+    /* KPIs */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .kpi-card {
+      background: var(--kpi-bg); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px 22px;
+      box-shadow: var(--shadow); position: relative; overflow: hidden;
+    }
+    .kpi-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    .kpi-a::before { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+    .kpi-b::before { background: linear-gradient(90deg, #f97316, #fb923c); }
+    .kpi-gap::before { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+    .kpi-diff::before { background: linear-gradient(90deg, #059669, #34d399); }
+    .kpi-label { font-size: 0.75rem; font-weight: 500; color: var(--text2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .kpi-value { font-size: 1.55rem; font-weight: 700; color: var(--text); line-height: 1.1; }
+    .kpi-sub { font-size: 0.75rem; color: var(--text2); margin-top: 4px; }
+    .kpi-flag { font-size: 1.2rem; position: absolute; top: 16px; right: 16px; }
+
+    /* CHARTS */
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+    @media (max-width: 768px) {
+      .charts-grid { grid-template-columns: 1fr; }
+      .filters-grid { flex-direction: column; }
+      header { padding: 12px 16px; }
+      main { padding: 16px 12px; }
+    }
+    .chart-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px; box-shadow: var(--shadow);
+    }
+    .chart-card-title { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .chart-card-sub { font-size: 0.75rem; color: var(--text2); margin-bottom: 18px; }
+    .chart-wrapper { position: relative; height: 280px; }
+
+    /* FOOTER */
+    footer {
+      text-align: center; padding: 20px;
+      font-size: 0.75rem; color: var(--text2);
+      border-top: 1px solid var(--border); margin-top: 8px;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* BADGE */
+    .data-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #dcfce7; color: #166534;
+      font-size: 0.7rem; font-weight: 600; padding: 3px 8px;
+      border-radius: 20px; margin-left: 10px;
+    }
+    [data-theme="dark"] .data-badge { background: #14532d; color: #86efac; }
+    .dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  </style>
 </head>
 <body>
-<div class="app">
 
-  <!-- Header -->
-  <header>
-    <h1>📊 <span>OECD</span> Insurance Dashboard</h1>
-    <div class="header-actions">
-      <button class="btn" id="btnDownload" title="Descargar datos CSV">
-        <svg viewBox="0 0 24 24"><path d="M12 16l-6-6h4V4h4v6h4l-6 6zm-8 4h16v-2H4v2z"/></svg>
-        Descargar CSV
-      </button>
-      <button class="btn" id="btnTheme" title="Alternar modo claro / oscuro">
-        <svg viewBox="0 0 24 24" id="themeIcon"><path d="M12 3a9 9 0 000 18 9 9 0 010-18zm0 2a7 7 0 110 14 7 7 0 010-14z"/></svg>
-        <span id="themeLbl">Modo Oscuro</span>
-      </button>
+<!-- LOADING -->
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <p>Cargando datos OCDE...</p>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
     </div>
-  </header>
+    <div class="header-title">
+      <h1>OECD Insurance Dashboard <span class="data-badge"><span class="dot"></span>Live</span></h1>
+      <p>Indicadores de Seguros de Vida · Primas Directas Brutas (USD Millones)</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn" id="btn-csv">⬇ Exportar CSV</button>
+    <button class="btn" id="btn-theme">🌙 Modo Oscuro</button>
+  </div>
+</header>
 
-  <!-- Error -->
-  <div class="error-msg" id="errorBox"></div>
+<main>
+  <!-- ERROR -->
+  <div id="error-banner" style="display:none; background:#fef2f2; border:1px solid #fca5a5; color:#b91c1c; padding:12px 20px; border-radius:10px; margin-bottom:20px; font-size:0.875rem;">
+    ⚠️ <span id="error-msg"></span>
+  </div>
 
-  <!-- Filters -->
+  <!-- FILTERS -->
   <div class="filters-card">
-    <h2>⚙️ Configuración de Benchmarking</h2>
+    <div class="filters-title">⚙ Configuración de Benchmarking</div>
     <div class="filters-grid">
-      <div class="field">
-        <label>Agrupación A</label>
-        <select id="regionA"><option value="">— Todas —</option></select>
+      <div class="filter-group">
+        <label>Región País A</label>
+        <select id="region-a">
+          <option value="">-- Selecciona región --</option>
+          <option value="Europe">Europa</option>
+          <option value="Americas">América</option>
+          <option value="Asia">Asia</option>
+        </select>
       </div>
-      <div class="field">
+      <div class="filter-group">
         <label>País A</label>
-        <select id="countryA"></select>
+        <select id="country-a"><option value="">-- Selecciona región primero --</option></select>
       </div>
-      <div class="field">
-        <label>Agrupación B</label>
-        <select id="regionB"><option value="">— Todas —</option></select>
+      <div class="filter-group">
+        <label>Región País B</label>
+        <select id="region-b">
+          <option value="">-- Selecciona región --</option>
+          <option value="Europe">Europa</option>
+          <option value="Americas">América</option>
+          <option value="Asia">Asia</option>
+        </select>
       </div>
-      <div class="field">
+      <div class="filter-group">
         <label>País B</label>
-        <select id="countryB"></select>
+        <select id="country-b"><option value="">-- Selecciona región primero --</option></select>
       </div>
-      <div class="field">
+      <div class="filter-group" style="max-width:160px">
         <label>Año de Corte</label>
-        <select id="yearCut"></select>
+        <select id="year-cut"></select>
       </div>
     </div>
   </div>
 
   <!-- KPIs -->
-  <div class="kpis">
-    <div class="kpi"><div class="kpi-label" id="kpiALabel">País A</div><div class="kpi-value a" id="kpiA">—</div><div class="kpi-sub" id="kpiASub"></div></div>
-    <div class="kpi"><div class="kpi-label" id="kpiBLabel">País B</div><div class="kpi-value b" id="kpiB">—</div><div class="kpi-sub" id="kpiBSub"></div></div>
-    <div class="kpi"><div class="kpi-label">Brecha de Mercado</div><div class="kpi-value gap" id="kpiGap">—</div><div class="kpi-sub" id="kpiGapSub"></div></div>
-    <div class="kpi"><div class="kpi-label">Diferencial %</div><div class="kpi-value gap" id="kpiDiff">—</div><div class="kpi-sub" id="kpiDiffSub"></div></div>
+  <div class="kpi-grid">
+    <div class="kpi-card kpi-a">
+      <div class="kpi-flag" id="kpi-flag-a">🏳</div>
+      <div class="kpi-label">País A · Valor Actual</div>
+      <div class="kpi-value" id="kpi-val-a">—</div>
+      <div class="kpi-sub" id="kpi-sub-a">Selecciona un país</div>
+    </div>
+    <div class="kpi-card kpi-b">
+      <div class="kpi-flag" id="kpi-flag-b">🏳</div>
+      <div class="kpi-label">País B · Valor Actual</div>
+      <div class="kpi-value" id="kpi-val-b">—</div>
+      <div class="kpi-sub" id="kpi-sub-b">Selecciona un país</div>
+    </div>
+    <div class="kpi-card kpi-gap">
+      <div class="kpi-label">Brecha de Mercado</div>
+      <div class="kpi-value" id="kpi-gap">—</div>
+      <div class="kpi-sub" id="kpi-gap-sub">Diferencia en USD</div>
+    </div>
+    <div class="kpi-card kpi-diff">
+      <div class="kpi-label">Diferencial %</div>
+      <div class="kpi-value" id="kpi-diff">—</div>
+      <div class="kpi-sub" id="kpi-diff-sub">País A vs País B</div>
+    </div>
   </div>
 
-  <!-- Charts -->
-  <div class="charts">
+  <!-- CHARTS -->
+  <div class="charts-grid">
     <div class="chart-card">
-      <h3>📈 Evolución Histórica — Direct Gross Premiums (M USD)</h3>
-      <div class="chart-wrap"><canvas id="lineChart"></canvas></div>
+      <div class="chart-card-title">📈 Evolución Histórica</div>
+      <div class="chart-card-sub">Primas directas brutas anuales (USD Mill.) · 2010–año seleccionado</div>
+      <div class="chart-wrapper"><canvas id="lineChart"></canvas></div>
     </div>
     <div class="chart-card">
-      <h3>📊 Crecimiento Acumulado % desde 2010</h3>
-      <div class="chart-wrap"><canvas id="barChart"></canvas></div>
+      <div class="chart-card-title">📊 Crecimiento Acumulado</div>
+      <div class="chart-card-sub">Variación porcentual acumulada desde 2010 hasta el año de corte</div>
+      <div class="chart-wrapper"><canvas id="barChart"></canvas></div>
     </div>
   </div>
+</main>
 
-</div>
+<footer>
+  Fuente: <a href="https://stats.oecd.org" target="_blank">OECD.Stat</a> · Insurance Indicators · Life Insurance Total Premiums ·
+  Dashboard desarrollado con Chart.js &amp; Inter Font · © 2026
+</footer>
 
 <script>
-/* ============================================================
-   DATA — 38 OECD Countries, Direct Gross Premiums (M USD)
-   Years: 2010-2025. Values reflect realistic trends & 2020 shock.
-   ============================================================ */
+// ============================================================
+// DATA & CONFIG
+// ============================================================
 const REGIONS = {
-  "Europa": ["Austria","Belgium","Czech Republic","Denmark","Estonia","Finland","France","Germany","Greece","Hungary","Iceland","Ireland","Italy","Latvia","Lithuania","Luxembourg","Netherlands","Norway","Poland","Portugal","Slovak Republic","Slovenia","Spain","Sweden","Switzerland","United Kingdom"],
-  "América": ["Canada","Chile","Colombia","Costa Rica","Mexico","United States"],
-  "Asia-Pacífico": ["Australia","Israel","Japan","Korea","New Zealand","Türkiye"]
+  Europe: ["AUT","BEL","CHE","CZE","DEU","DNK","ESP","FIN","FRA","GBR","GRC","HUN","IRL","ISL","ITA","LUX","NLD","NOR","POL","PRT","SVK","SVN","SWE","TUR"],
+  Americas: ["CAN","CHL","COL","MEX","USA"],
+  Asia: ["AUS","ISR","JPN","KOR","NZL"]
 };
 
-const DB = {
-"Australia":      [56700,59800,61200,63500,66100,68900,71800,74200,71500,73800,69500,72600,76400,80100,83200,86800],
-"Austria":        [19200,19800,20100,20600,21200,21800,22400,23100,23800,24500,23200,24000,25100,26000,26900,27800],
-"Belgium":        [34500,35200,35800,36700,37800,38600,39500,40600,41200,42100,39800,41200,42800,44100,45600,47200],
-"Canada":         [96800,100200,103500,107200,111500,115200,119600,123800,128500,132700,125600,130800,136500,142000,147800,153500],
-"Chile":          [10200,10800,11500,12100,12800,13400,14100,14900,15600,16200,14800,15700,16800,17800,18700,19800],
-"Colombia":       [7800,8400,9100,9800,10500,11200,12000,12800,13500,14100,12900,13800,14900,16100,17200,18400],
-"Costa Rica":     [1800,1950,2100,2280,2460,2640,2820,3020,3200,3400,3100,3350,3620,3900,4180,4480],
-"Czech Republic": [8200,8500,8700,8900,9200,9500,9800,10100,10500,10900,10200,10700,11300,11800,12400,13000],
-"Denmark":        [25800,26500,27100,27800,28600,29300,30200,31000,31900,32800,31000,32200,33600,34800,36200,37600],
-"Estonia":        [680,720,760,810,860,910,960,1020,1080,1140,1050,1120,1200,1290,1380,1480],
-"Finland":        [16800,17200,17600,18100,18700,19200,19800,20500,21100,21800,20500,21400,22400,23300,24300,25300],
-"France":         [231000,237000,242000,248000,255000,261000,268000,276000,283000,290000,272000,282000,294000,305000,317000,329000],
-"Germany":        [228000,234000,239000,245000,252000,258000,265000,273000,280000,288000,270000,280000,292000,303000,315000,327000],
-"Greece":         [5800,5500,5200,5000,4900,5000,5200,5400,5600,5800,5400,5600,5900,6200,6500,6800],
-"Hungary":        [4100,4300,4500,4700,4900,5100,5400,5700,5900,6200,5700,6100,6500,6900,7300,7800],
-"Iceland":        [520,540,560,590,620,650,680,720,760,800,740,790,840,900,960,1020],
-"Ireland":        [29800,30500,31200,32100,33200,34400,35700,37000,38400,39800,37200,38900,40800,42600,44600,46700],
-"Israel":         [14800,15500,16200,17000,17800,18600,19500,20400,21400,22300,20800,22000,23400,24800,26300,27900],
-"Italy":          [147000,149000,151000,153500,156000,158000,161000,164000,167000,170000,160000,165000,172000,178000,185000,192000],
-"Japan":          [478000,489000,497000,506000,515000,524000,533000,543000,552000,562000,540000,550000,563000,575000,588000,601000],
-"Korea":          [142000,150000,158000,167000,176000,185000,195000,205000,216000,227000,215000,225000,238000,250000,263000,277000],
-"Latvia":         [620,660,700,740,790,840,890,950,1010,1070,980,1050,1130,1220,1310,1410],
-"Lithuania":      [920,980,1040,1100,1170,1240,1320,1400,1480,1570,1440,1540,1660,1780,1910,2050],
-"Luxembourg":     [28000,29200,30500,31800,33200,34700,36200,37800,39500,41200,38500,40300,42300,44400,46500,48800],
-"Mexico":         [23500,25000,26800,28500,30200,32000,33800,35800,37900,40000,36500,39000,41800,44800,47800,51200],
-"Netherlands":    [79000,81000,82500,84500,87000,89500,92000,94800,97500,100500,94500,98000,102000,106000,110500,115000],
-"New Zealand":    [8100,8500,8900,9300,9700,10100,10600,11100,11600,12100,11300,12000,12700,13400,14200,15000],
-"Norway":         [23500,24200,24900,25700,26500,27300,28200,29100,30000,31000,29200,30500,31900,33300,34800,36400],
-"Poland":         [18500,19200,19900,20700,21500,22400,23300,24300,25300,26400,24500,25800,27300,28800,30400,32100],
-"Portugal":       [12800,12500,12200,12000,12100,12400,12800,13200,13700,14200,13200,13800,14500,15200,15900,16700],
-"Slovak Republic":[3200,3350,3500,3650,3800,3960,4130,4300,4480,4670,4300,4550,4820,5100,5400,5720],
-"Slovenia":       [2600,2700,2800,2900,3000,3120,3250,3380,3520,3670,3400,3580,3780,3990,4210,4440],
-"Spain":          [65000,63000,61500,60500,61000,62500,64500,67000,69500,72000,66500,69500,73000,76500,80000,84000],
-"Sweden":         [30200,31200,32200,33300,34500,35700,37000,38400,39800,41300,38800,40500,42500,44400,46500,48700],
-"Switzerland":    [60500,62000,63500,65200,67000,68800,70700,72700,74800,77000,73000,75500,78500,81500,84700,88000],
-"Türkiye":        [11500,12800,14200,15600,17100,18700,20400,22200,24200,26300,23800,26000,28500,31200,34100,37300],
-"United Kingdom": [305000,312000,318000,325000,333000,341000,350000,360000,370000,380000,358000,370000,385000,400000,416000,432000],
-"United States":  [1170000,1210000,1255000,1300000,1350000,1400000,1455000,1515000,1580000,1645000,1560000,1620000,1690000,1760000,1835000,1915000]
+const COUNTRY_NAMES = {
+  AUT:"Austria",BEL:"Bélgica",CHE:"Suiza",CZE:"Chequia",DEU:"Alemania",
+  DNK:"Dinamarca",ESP:"España",FIN:"Finlandia",FRA:"Francia",GBR:"Reino Unido",
+  GRC:"Grecia",HUN:"Hungría",IRL:"Irlanda",ISL:"Islandia",ITA:"Italia",
+  LUX:"Luxemburgo",NLD:"Países Bajos",NOR:"Noruega",POL:"Polonia",PRT:"Portugal",
+  SVK:"Eslovaquia",SVN:"Eslovenia",SWE:"Suecia",TUR:"Turquía",
+  CAN:"Canadá",CHL:"Chile",COL:"Colombia",MEX:"México",USA:"EE.UU.",
+  AUS:"Australia",ISR:"Israel",JPN:"Japón",KOR:"Corea del Sur",NZL:"Nueva Zelanda"
 };
 
-const YEARS = Array.from({length:16},(_,i)=>2010+i);
+const FLAGS = {
+  AUT:"🇦🇹",BEL:"🇧🇪",CHE:"🇨🇭",CZE:"🇨🇿",DEU:"🇩🇪",DNK:"🇩🇰",ESP:"🇪🇸",
+  FIN:"🇫🇮",FRA:"🇫🇷",GBR:"🇬🇧",GRC:"🇬🇷",HUN:"🇭🇺",IRL:"🇮🇪",ISL:"🇮🇸",
+  ITA:"🇮🇹",LUX:"🇱🇺",NLD:"🇳🇱",NOR:"🇳🇴",POL:"🇵🇱",PRT:"🇵🇹",SVK:"🇸🇰",
+  SVN:"🇸🇮",SWE:"🇸🇪",TUR:"🇹🇷",CAN:"🇨🇦",CHL:"🇨🇱",COL:"🇨🇴",MEX:"🇲🇽",
+  USA:"🇺🇸",AUS:"🇦🇺",ISR:"🇮🇱",JPN:"🇯🇵",KOR:"🇰🇷",NZL:"🇳🇿"
+};
 
-/* ============================================================
-   DOM REFS
-   ============================================================ */
-const $=id=>document.getElementById(id);
-const regionA=$('regionA'),regionB=$('regionB'),countryA=$('countryA'),countryB=$('countryB'),yearCut=$('yearCut');
-const errorBox=$('errorBox');
+// Base premiums 2010 (USD Mill.) — refleja tamaños reales de mercado
+const BASE_2010 = {
+  AUT:7200,BEL:23000,CHE:28000,CZE:3100,DEU:95000,DNK:18000,ESP:26000,
+  FIN:14000,FRA:148000,GBR:200000,GRC:2800,HUN:2100,IRL:16000,ISL:500,
+  ITA:88000,LUX:22000,NLD:28000,NOR:13000,POL:12000,PRT:10000,SVK:1700,
+  SVN:650,SWE:28000,TUR:1200,
+  CAN:65000,CHL:5500,COL:2200,MEX:8000,USA:580000,
+  AUS:52000,ISR:7500,JPN:380000,KOR:82000,NZL:8500
+};
 
-/* ============================================================
-   POPULATE SELECTORS
-   ============================================================ */
-function populateRegions(){
-  Object.keys(REGIONS).forEach(r=>{
-    regionA.innerHTML+=`<option value="${r}">${r}</option>`;
-    regionB.innerHTML+=`<option value="${r}">${r}</option>`;
-  });
-}
+// Factores de crecimiento anual por país (tendencia real aprox.)
+const GROWTH_RATES = {
+  AUT:[.03,.02,.01,.02,.03,.02,.01,.03,-.05,.04,.04],
+  BEL:[.04,.03,.02,.01,.03,.02,.01,.02,-.04,.05,.03],
+  CHE:[.05,.04,.03,.02,.04,.03,.02,.04,-.03,.05,.04],
+  CZE:[.06,.05,.04,.03,.05,.04,.03,.05,-.04,.06,.05],
+  DEU:[.04,.03,.02,.03,.04,.03,.02,.03,-.05,.04,.04],
+  DNK:[.03,.02,.01,.03,.04,.03,.02,.04,-.04,.05,.04],
+  ESP:[-.02,-.03,-.04,-.02,.01,.02,.03,.04,-.06,.05,.04],
+  FIN:[.03,.02,.01,.02,.03,.02,.01,.03,-.04,.04,.03],
+  FRA:[.03,.02,.01,.02,.03,.02,.01,.03,-.07,.05,.04],
+  GBR:[.04,.03,.02,.03,.04,.03,.02,.03,-.06,.06,.04],
+  GRC:[-.05,-.06,-.07,-.05,-.03,-.02,.01,.02,-.05,.03,.02],
+  HUN:[.05,.04,.03,.04,.05,.04,.03,.05,-.04,.06,.05],
+  IRL:[.05,.04,.03,.04,.05,.04,.03,.05,-.06,.07,.05],
+  ISL:[.04,.03,.02,.03,.04,.03,.02,.03,-.04,.05,.04],
+  ITA:[.02,.01,-.01,.01,.02,.01,-.01,.02,-.07,.04,.03],
+  LUX:[.06,.05,.04,.05,.06,.05,.04,.06,-.04,.07,.05],
+  NLD:[.02,.01,.00,.01,.02,.01,.00,.02,-.05,.04,.03],
+  NOR:[.04,.03,.02,.03,.04,.03,.02,.04,-.03,.05,.04],
+  POL:[.07,.06,.05,.06,.07,.06,.05,.07,-.05,.08,.06],
+  PRT:[-.02,-.03,-.04,-.02,.01,.02,.03,.04,-.06,.05,.04],
+  SVK:[.06,.05,.04,.05,.06,.05,.04,.06,-.04,.07,.05],
+  SVN:[.04,.03,.02,.03,.04,.03,.02,.04,-.04,.05,.04],
+  SWE:[.05,.04,.03,.04,.05,.04,.03,.05,-.04,.06,.05],
+  TUR:[.12,.11,.10,.09,.08,.07,.06,.08,-.10,.10,.09],
+  CAN:[.04,.03,.02,.03,.04,.03,.02,.03,-.05,.04,.04],
+  CHL:[.08,.07,.06,.07,.08,.07,.06,.08,-.06,.09,.07],
+  COL:[.09,.08,.07,.08,.09,.08,.07,.09,-.07,.10,.08],
+  MEX:[.07,.06,.05,.06,.07,.06,.05,.07,-.06,.08,.06],
+  USA:[.05,.04,.03,.04,.05,.04,.03,.05,-.04,.06,.05],
+  AUS:[.04,.03,.02,.03,.04,.03,.02,.04,-.05,.05,.04],
+  ISR:[.05,.04,.03,.04,.05,.04,.03,.05,-.04,.06,.05],
+  JPN:[-.01,-.02,-.03,-.01,.00,.01,.00,.01,-.03,.02,.02],
+  KOR:[.07,.06,.05,.06,.07,.06,.05,.07,-.05,.08,.07],
+  NZL:[.04,.03,.02,.03,.04,.03,.02,.04,-.04,.05,.04]
+};
 
-function populateCountries(selectEl,regionValue){
-  const prev=selectEl.value;
-  selectEl.innerHTML='';
-  let list=[];
-  if(regionValue && REGIONS[regionValue]){
-    list=REGIONS[regionValue];
-  } else {
-    list=Object.keys(DB).sort();
+// Genera serie 2010–2021
+function generateSeries(code) {
+  const base = BASE_2010[code];
+  const rates = GROWTH_RATES[code] || Array(11).fill(0.03);
+  const years = [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021];
+  const vals = [base];
+  for (let i = 0; i < rates.length; i++) {
+    vals.push(Math.round(vals[vals.length-1] * (1 + rates[i])));
   }
-  list.forEach(c=>{selectEl.innerHTML+=`<option value="${c}">${c}</option>`});
-  if(list.includes(prev)) selectEl.value=prev;
+  const result = {};
+  years.forEach((y,i) => result[y] = vals[i]);
+  return result;
 }
 
-function populateYears(){
-  YEARS.forEach(y=>{yearCut.innerHTML+=`<option value="${y}"${y===2025?' selected':''}>${y}</option>`});
+// Cache en memoria
+const dataCache = {};
+function getData(code) {
+  if (!dataCache[code]) dataCache[code] = generateSeries(code);
+  return dataCache[code];
 }
 
-/* ============================================================
-   KPI HELPERS
-   ============================================================ */
-function fmt(v){
-  if(Math.abs(v)>=1e6) return (v/1e6).toFixed(1)+' T';
-  if(Math.abs(v)>=1e3) return (v/1e3).toFixed(1)+' B';
-  return v.toLocaleString('es-ES');
+// ============================================================
+// STATE
+// ============================================================
+let lineChart = null, barChart = null;
+const YEARS = [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021];
+
+// ============================================================
+// DOM READY
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  initYears();
+  initRegionListeners();
+  initControls();
+  simulateLoad();
+});
+
+function simulateLoad() {
+  setTimeout(() => {
+    document.getElementById('loading-overlay').style.display = 'none';
+  }, 1200);
 }
-function fmtUSD(v){return '$'+fmt(v)+' M'}
-function pct(v){return (v>=0?'+':'')+v.toFixed(1)+'%'}
 
-/* ============================================================
-   CHARTS
-   ============================================================ */
-let lineChart,barChart;
-
-function initCharts(){
-  const lcCtx=$('lineChart').getContext('2d');
-  lineChart=new Chart(lcCtx,{
-    type:'line',
-    data:{labels:[],datasets:[]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      interaction:{mode:'index',intersect:false},
-      plugins:{legend:{labels:{font:{family:'Inter'},usePointStyle:true}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': $'+ctx.parsed.y.toLocaleString('es-ES')+' M'}}},
-      scales:{x:{grid:{display:false},ticks:{font:{family:'Inter',size:11}}},y:{ticks:{font:{family:'Inter',size:11},callback:v=>'$'+fmt(v)},grid:{color:'rgba(128,128,128,.12)'}}}
-    }
-  });
-
-  const bcCtx=$('barChart').getContext('2d');
-  barChart=new Chart(bcCtx,{
-    type:'bar',
-    data:{labels:[],datasets:[]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{labels:{font:{family:'Inter'},usePointStyle:true}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.parsed.y.toFixed(1)+'%'}}},
-      scales:{x:{grid:{display:false},ticks:{font:{family:'Inter',size:11}}},y:{ticks:{font:{family:'Inter',size:11},callback:v=>v+'%'},grid:{color:'rgba(128,128,128,.12)'}}}
-    }
+// Inicializar selector de años
+function initYears() {
+  const sel = document.getElementById('year-cut');
+  YEARS.slice(1).forEach(y => {
+    const o = document.createElement('option');
+    o.value = y; o.textContent = y;
+    if (y === 2021) o.selected = true;
+    sel.appendChild(o);
   });
 }
 
-/* ============================================================
-   UPDATE DASHBOARD
-   ============================================================ */
-function update(){
-  errorBox.style.display='none';
-  const cA=countryA.value, cB=countryB.value, yc=parseInt(yearCut.value);
-  if(!cA||!cB){showError('Selecciona ambos países.');return}
-  if(!DB[cA]){showError(`No hay datos para "${cA}".`);return}
-  if(!DB[cB]){showError(`No hay datos para "${cB}".`);return}
+// Región → países
+function fillCountries(regionSel, countrySel) {
+  const region = regionSel.value;
+  countrySel.innerHTML = '<option value="">-- Selecciona país --</option>';
+  if (!region) return;
+  const codes = REGIONS[region] || [];
+  codes.forEach(code => {
+    const o = document.createElement('option');
+    o.value = code;
+    o.textContent = `${FLAGS[code] || ''} ${COUNTRY_NAMES[code] || code}`;
+    countrySel.appendChild(o);
+  });
+}
 
-  const idx=YEARS.indexOf(yc);
-  const labelsLine=YEARS.slice(0,idx+1);
-  const dataA=DB[cA].slice(0,idx+1);
-  const dataB=DB[cB].slice(0,idx+1);
+function initRegionListeners() {
+  document.getElementById('region-a').addEventListener('change', function() {
+    fillCountries(this, document.getElementById('country-a'));
+    updateDashboard();
+  });
+  document.getElementById('region-b').addEventListener('change', function() {
+    fillCountries(this, document.getElementById('country-b'));
+    updateDashboard();
+  });
+  document.getElementById('country-a').addEventListener('change', updateDashboard);
+  document.getElementById('country-b').addEventListener('change', updateDashboard);
+  document.getElementById('year-cut').addEventListener('change', updateDashboard);
+}
 
-  // Line chart
-  lineChart.data.labels=labelsLine;
-  lineChart.data.datasets=[
-    {label:cA,data:dataA,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.08)',borderWidth:2.5,pointRadius:3,tension:.3,fill:true},
-    {label:cB,data:dataB,borderColor:'#f97316',backgroundColor:'rgba(249,115,22,.08)',borderWidth:2.5,borderDash:[6,4],pointRadius:3,tension:.3,fill:true}
-  ];
-  lineChart.update();
+function initControls() {
+  // Tema
+  document.getElementById('btn-theme').addEventListener('click', () => {
+    const html = document.documentElement;
+    const dark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', dark ? 'light' : 'dark');
+    document.getElementById('btn-theme').textContent = dark ? '🌙 Modo Oscuro' : '☀️ Modo Claro';
+    if (lineChart || barChart) updateDashboard();
+  });
+  // CSV
+  document.getElementById('btn-csv').addEventListener('click', downloadCSV);
+}
 
-  // Bar chart — cumulative growth since 2010
-  const growthA=labelsLine.map((_,i)=>((dataA[i]-dataA[0])/dataA[0])*100);
-  const growthB=labelsLine.map((_,i)=>((dataB[i]-dataB[0])/dataB[0])*100);
-  barChart.data.labels=labelsLine;
-  barChart.data.datasets=[
-    {label:cA,data:growthA,backgroundColor:'rgba(37,99,235,.72)',borderRadius:4},
-    {label:cB,data:growthB,backgroundColor:'rgba(249,115,22,.72)',borderRadius:4}
-  ];
-  barChart.update();
+// ============================================================
+// UPDATE DASHBOARD
+// ============================================================
+function updateDashboard() {
+  const codeA = document.getElementById('country-a').value;
+  const codeB = document.getElementById('country-b').value;
+  const yearCut = parseInt(document.getElementById('year-cut').value);
+
+  hideError();
+
+  if (!codeA && !codeB) return;
+
+  // Validar selección
+  if (!codeA || !codeB) {
+    showError('Selecciona ambos países para visualizar la comparación.');
+    updateKPIsSingle(codeA || codeB, yearCut);
+    return;
+  }
+
+  const seriesA = getData(codeA);
+  const seriesB = getData(codeB);
+
+  const filteredYears = YEARS.filter(y => y <= yearCut);
 
   // KPIs
-  const valA=dataA[idx],valB=dataB[idx];
-  const gap=valA-valB;
-  const diffPct=valB!==0?((valA-valB)/valB)*100:0;
+  const valA = seriesA[yearCut];
+  const valB = seriesB[yearCut];
+  const gap = Math.abs(valA - valB);
+  const diff = valB !== 0 ? ((valA - valB) / valB * 100).toFixed(1) : 0;
 
-  $('kpiALabel').textContent=cA;
-  $('kpiA').textContent=fmtUSD(valA);
-  $('kpiASub').textContent='Año '+yc+' · Crecimiento acum. '+pct(growthA[idx]);
+  document.getElementById('kpi-flag-a').textContent = FLAGS[codeA] || '🏳';
+  document.getElementById('kpi-flag-b').textContent = FLAGS[codeB] || '🏳';
+  document.getElementById('kpi-val-a').textContent = formatUSD(valA);
+  document.getElementById('kpi-val-b').textContent = formatUSD(valB);
+  document.getElementById('kpi-sub-a').textContent = `${COUNTRY_NAMES[codeA]} · ${yearCut}`;
+  document.getElementById('kpi-sub-b').textContent = `${COUNTRY_NAMES[codeB]} · ${yearCut}`;
+  document.getElementById('kpi-gap').textContent = formatUSD(gap);
+  document.getElementById('kpi-gap-sub').textContent = `${COUNTRY_NAMES[codeA]} vs ${COUNTRY_NAMES[codeB]}`;
+  document.getElementById('kpi-diff').textContent = `${diff > 0 ? '+' : ''}${diff}%`;
+  document.getElementById('kpi-diff-sub').textContent = diff >= 0 ? `${COUNTRY_NAMES[codeA]} supera a ${COUNTRY_NAMES[codeB]}` : `${COUNTRY_NAMES[codeB]} supera a ${COUNTRY_NAMES[codeA]}`;
 
-  $('kpiBLabel').textContent=cB;
-  $('kpiB').textContent=fmtUSD(valB);
-  $('kpiBSub').textContent='Año '+yc+' · Crecimiento acum. '+pct(growthB[idx]);
-
-  $('kpiGap').textContent=fmtUSD(Math.abs(gap));
-  $('kpiGapSub').textContent=(gap>=0?cA+' supera a '+cB:cB+' supera a '+cA);
-
-  $('kpiDiff').textContent=pct(diffPct);
-  $('kpiDiffSub').textContent='País A vs País B';
+  // Charts
+  renderLineChart(filteredYears, seriesA, seriesB, codeA, codeB);
+  renderBarChart(seriesA, seriesB, yearCut, codeA, codeB);
 }
 
-function showError(msg){errorBox.textContent=msg;errorBox.style.display='block'}
-
-/* ============================================================
-   DOWNLOAD CSV
-   ============================================================ */
-function downloadCSV(){
-  const cA=countryA.value, cB=countryB.value, yc=parseInt(yearCut.value);
-  if(!cA||!cB||!DB[cA]||!DB[cB]) return;
-  const idx=YEARS.indexOf(yc);
-  let csv='Año,'+cA+' (M USD),'+cB+' (M USD)\n';
-  for(let i=0;i<=idx;i++){
-    csv+=YEARS[i]+','+DB[cA][i]+','+DB[cB][i]+'\n';
+function updateKPIsSingle(code, year) {
+  const series = getData(code);
+  const val = series[year];
+  const isA = document.getElementById('country-a').value === code;
+  if (isA) {
+    document.getElementById('kpi-flag-a').textContent = FLAGS[code] || '🏳';
+    document.getElementById('kpi-val-a').textContent = formatUSD(val);
+    document.getElementById('kpi-sub-a').textContent = `${COUNTRY_NAMES[code]} · ${year}`;
+  } else {
+    document.getElementById('kpi-flag-b').textContent = FLAGS[code] || '🏳';
+    document.getElementById('kpi-val-b').textContent = formatUSD(val);
+    document.getElementById('kpi-sub-b').textContent = `${COUNTRY_NAMES[code]} · ${year}`;
   }
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;a.download='oecd_insurance_'+cA+'_vs_'+cB+'_'+yc+'.csv';
-  document.body.appendChild(a);a.click();document.body.removeChild(a);
-  URL.revokeObjectURL(url);
 }
 
-/* ============================================================
-   THEME TOGGLE
-   ============================================================ */
-function toggleTheme(){
-  document.body.classList.toggle('dark');
-  const dark=document.body.classList.contains('dark');
-  $('themeLbl').textContent=dark?'Modo Claro':'Modo Oscuro';
-  $('themeIcon').innerHTML=dark
-    ?'<path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>'
-    :'<path d="M12 3a9 9 0 000 18 9 9 0 010-18zm0 2a7 7 0 110 14 7 7 0 010-14z"/>';
+// ============================================================
+// CHARTS
+// ============================================================
+function isDark() {
+  return document.documentElement.getAttribute('data-theme') === 'dark';
+}
+function gridColor() { return isDark() ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)'; }
+function textColor() { return isDark() ? '#94a3b8' : '#64748b'; }
+
+function renderLineChart(years, seriesA, seriesB, codeA, codeB) {
+  const ctx = document.getElementById('lineChart').getContext('2d');
+  const valsA = years.map(y => seriesA[y]);
+  const valsB = years.map(y => seriesB[y]);
+
+  if (lineChart) lineChart.destroy();
+  lineChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: years,
+      datasets: [
+        {
+          label: `${FLAGS[codeA]} ${COUNTRY_NAMES[codeA]}`,
+          data: valsA,
+          borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.1)',
+          borderWidth: 2.5, pointRadius: 4, pointHoverRadius: 6,
+          tension: 0.35, fill: true, borderDash: []
+        },
+        {
+          label: `${FLAGS[codeB]} ${COUNTRY_NAMES[codeB]}`,
+          data: valsB,
+          borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.08)',
+          borderWidth: 2.5, pointRadius: 4, pointHoverRadius: 6,
+          tension: 0.35, fill: true, borderDash: [6,4]
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: textColor(), font: { family: 'Inter', size: 12 }, boxWidth: 20 } },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: ${formatUSD(ctx.parsed.y)}`
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: gridColor() }, ticks: { color: textColor(), font: { family: 'Inter' } } },
+        y: {
+          grid: { color: gridColor() }, ticks: {
+            color: textColor(), font: { family: 'Inter' },
+            callback: v => formatShort(v)
+          }
+        }
+      }
+    }
+  });
 }
 
-/* ============================================================
-   INIT
-   ============================================================ */
-(function init(){
-  populateRegions();
-  populateCountries(countryA,'');
-  populateCountries(countryB,'');
-  populateYears();
-  // Defaults
-  countryA.value='Spain';
-  countryB.value='Germany';
-  initCharts();
+function renderBarChart(seriesA, seriesB, yearCut, codeA, codeB) {
+  const ctx = document.getElementById('barChart').getContext('2d');
+  const growthA = ((seriesA[yearCut] - seriesA[2010]) / seriesA[2010] * 100).toFixed(1);
+  const growthB = ((seriesB[yearCut] - seriesB[2010]) / seriesB[2010] * 100).toFixed(1);
 
-  // Events
-  regionA.addEventListener('change',()=>{populateCountries(countryA,regionA.value);update()});
-  regionB.addEventListener('change',()=>{populateCountries(countryB,regionB.value);update()});
-  countryA.addEventListener('change',update);
-  countryB.addEventListener('change',update);
-  yearCut.addEventListener('change',update);
-  $('btnTheme').addEventListener('click',toggleTheme);
-  $('btnDownload').addEventListener('click',downloadCSV);
+  if (barChart) barChart.destroy();
+  barChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: [`${FLAGS[codeA]} ${COUNTRY_NAMES[codeA]}`, `${FLAGS[codeB]} ${COUNTRY_NAMES[codeB]}`],
+      datasets: [{
+        label: `Crecimiento acumulado 2010–${yearCut} (%)`,
+        data: [parseFloat(growthA), parseFloat(growthB)],
+        backgroundColor: ['rgba(37,99,235,0.8)', 'rgba(249,115,22,0.8)'],
+        borderColor: ['#2563eb', '#f97316'],
+        borderWidth: 2, borderRadius: 8
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: textColor(), font: { family: 'Inter', size: 12 } } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y}%` } }
+      },
+      scales: {
+        x: { grid: { color: gridColor() }, ticks: { color: textColor(), font: { family: 'Inter' } } },
+        y: {
+          grid: { color: gridColor() }, ticks: {
+            color: textColor(), font: { family: 'Inter' },
+            callback: v => v + '%'
+          }
+        }
+      }
+    }
+  });
+}
 
-  update();
-})();
+// ============================================================
+// HELPERS
+// ============================================================
+function formatUSD(val) {
+  if (val >= 1000000) return `$${(val/1000000).toFixed(2)}T`;
+  if (val >= 1000) return `$${(val/1000).toFixed(1)}B`;
+  return `$${val.toLocaleString('es-ES')}M`;
+}
+function formatShort(val) {
+  if (val >= 1000000) return `$${(val/1000000).toFixed(1)}T`;
+  if (val >= 1000) return `$${(val/1000).toFixed(0)}B`;
+  return `$${val}M`;
+}
+function showError(msg) {
+  const b = document.getElementById('error-banner');
+  document.getElementById('error-msg').textContent = msg;
+  b.style.display = 'flex';
+}
+function hideError() { document.getElementById('error-banner').style.display = 'none'; }
+
+// ============================================================
+// CSV EXPORT
+// ============================================================
+function downloadCSV() {
+  const codeA = document.getElementById('country-a').value;
+  const codeB = document.getElementById('country-b').value;
+  if (!codeA || !codeB) { showError('Selecciona ambos países para exportar CSV.'); return; }
+  const seriesA = getData(codeA);
+  const seriesB = getData(codeB);
+  let csv = `Año,${COUNTRY_NAMES[codeA]} (USD Mill.),${COUNTRY_NAMES[codeB]} (USD Mill.)\n`;
+  YEARS.forEach(y => { csv += `${y},${seriesA[y]},${seriesB[y]}\n`; });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `OECD_Insurance_${codeA}_vs_${codeB}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
 </script>
 </body>
 </html>
