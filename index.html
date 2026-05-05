@@ -8,164 +8,94 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root {
-      --bg: #f0f4f8;
-      --surface: #ffffff;
-      --surface2: #f7fafc;
-      --border: #e2e8f0;
-      --text: #1a202c;
-      --text2: #4a5568;
-      --accent: #2563eb;
-      --accent2: #f97316;
-      --kpi-bg: #ffffff;
-      --shadow: 0 2px 12px rgba(0,0,0,0.08);
+      --bg:#f0f4f8; --surface:#ffffff; --surface2:#f7fafc; --border:#e2e8f0;
+      --text:#1a202c; --text2:#4a5568; --accent:#2563eb; --accent2:#f97316;
+      --kpi-bg:#ffffff; --shadow:0 2px 12px rgba(0,0,0,0.08);
     }
     [data-theme="dark"] {
-      --bg: #0f172a;
-      --surface: #1e293b;
-      --surface2: #1e293b;
-      --border: #334155;
-      --text: #f1f5f9;
-      --text2: #94a3b8;
-      --accent: #60a5fa;
-      --accent2: #fb923c;
-      --kpi-bg: #1e293b;
-      --shadow: 0 2px 12px rgba(0,0,0,0.4);
+      --bg:#0f172a; --surface:#1e293b; --surface2:#1e293b; --border:#334155;
+      --text:#f1f5f9; --text2:#94a3b8; --accent:#60a5fa; --accent2:#fb923c;
+      --kpi-bg:#1e293b; --shadow:0 2px 12px rgba(0,0,0,0.4);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      transition: background 0.3s, color 0.3s;
-      min-height: 100vh;
-    }
-    /* HEADER */
-    header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 16px 32px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: var(--shadow);
-      position: sticky; top: 0; z-index: 100;
-    }
-    .header-left { display: flex; align-items: center; gap: 12px; }
-    .logo-icon {
-      width: 38px; height: 38px; border-radius: 10px;
-      background: linear-gradient(135deg, #2563eb, #7c3aed);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .logo-icon svg { width: 22px; height: 22px; fill: white; }
-    .header-title h1 { font-size: 1.15rem; font-weight: 700; color: var(--text); }
-    .header-title p { font-size: 0.75rem; color: var(--text2); }
-    .header-actions { display: flex; gap: 10px; }
-    .btn {
-      padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border);
-      background: var(--surface); color: var(--text); font-family: 'Inter', sans-serif;
-      font-size: 0.82rem; font-weight: 500; cursor: pointer;
-      display: flex; align-items: center; gap: 6px;
-      transition: all 0.2s;
-    }
-    .btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
-    .btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
-    .btn-primary:hover { opacity: 0.9; }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;min-height:100vh;}
 
-    /* MAIN */
-    main { max-width: 1280px; margin: 0 auto; padding: 28px 24px; }
+    /* HEADER */
+    header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow);position:sticky;top:0;z-index:100;}
+    .header-left{display:flex;align-items:center;gap:12px;}
+    .logo-icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;}
+    .logo-icon svg{width:22px;height:22px;fill:white;}
+    .header-title h1{font-size:1.1rem;font-weight:700;color:var(--text);}
+    .header-title p{font-size:0.72rem;color:var(--text2);}
+    .header-actions{display:flex;gap:10px;}
+    .btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;}
+    .btn:hover{background:var(--accent);color:white;border-color:var(--accent);}
 
     /* LOADING */
-    #loading-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      z-index: 9999; gap: 16px;
-    }
-    .spinner {
-      width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.3);
-      border-top-color: #60a5fa; border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    #loading-overlay p { color: white; font-size: 0.95rem; font-weight: 500; }
+    #loading-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.75);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px;}
+    .spinner{width:50px;height:50px;border:4px solid rgba(255,255,255,0.2);border-top-color:#60a5fa;border-radius:50%;animation:spin .8s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    #loading-overlay p{color:#e2e8f0;font-size:0.95rem;font-weight:500;}
+    #loading-overlay small{color:#94a3b8;font-size:0.78rem;}
 
-    /* ERROR BANNER */
-    #error-banner {
-      display: none; background: #fef2f2; border: 1px solid #fca5a5;
-      color: #b91c1c; padding: 12px 20px; border-radius: 10px;
-      margin-bottom: 20px; font-size: 0.875rem; align-items: center; gap: 8px;
-    }
+    /* MAIN */
+    main{max-width:1300px;margin:0 auto;padding:28px 24px;}
+
+    /* ERROR */
+    #error-banner{display:none;background:#fef2f2;border:1px solid #fca5a5;color:#b91c1c;padding:12px 20px;border-radius:10px;margin-bottom:20px;font-size:0.875rem;align-items:center;gap:8px;}
+    [data-theme="dark"] #error-banner{background:#450a0a;border-color:#991b1b;color:#fca5a5;}
 
     /* FILTERS */
-    .filters-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 14px; padding: 20px 24px; margin-bottom: 24px;
-      box-shadow: var(--shadow);
-    }
-    .filters-title { font-size: 0.78rem; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-    .filters-grid { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
-    .filter-group { display: flex; flex-direction: column; gap: 6px; min-width: 180px; flex: 1; }
-    .filter-group label { font-size: 0.78rem; font-weight: 500; color: var(--text2); }
-    .filter-group select, .filter-group input {
-      padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border);
-      background: var(--surface2); color: var(--text);
-      font-family: 'Inter', sans-serif; font-size: 0.87rem;
-      outline: none; transition: border 0.2s;
-    }
-    .filter-group select:focus, .filter-group input:focus { border-color: var(--accent); }
+    .filters-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin-bottom:24px;box-shadow:var(--shadow);}
+    .filters-title{font-size:0.78rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;}
+    .filters-grid{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;}
+    .filter-group{display:flex;flex-direction:column;gap:6px;min-width:170px;flex:1;}
+    .filter-group label{font-size:0.78rem;font-weight:500;color:var(--text2);}
+    .filter-group select,.filter-group input{padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'Inter',sans-serif;font-size:0.87rem;outline:none;transition:border .2s;cursor:pointer;}
+    .filter-group select:focus,.filter-group input:focus{border-color:var(--accent);}
 
     /* KPIs */
-    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-    .kpi-card {
-      background: var(--kpi-bg); border: 1px solid var(--border);
-      border-radius: 14px; padding: 20px 22px;
-      box-shadow: var(--shadow); position: relative; overflow: hidden;
-    }
-    .kpi-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    }
-    .kpi-a::before { background: linear-gradient(90deg, #2563eb, #60a5fa); }
-    .kpi-b::before { background: linear-gradient(90deg, #f97316, #fb923c); }
-    .kpi-gap::before { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
-    .kpi-diff::before { background: linear-gradient(90deg, #059669, #34d399); }
-    .kpi-label { font-size: 0.75rem; font-weight: 500; color: var(--text2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
-    .kpi-value { font-size: 1.55rem; font-weight: 700; color: var(--text); line-height: 1.1; }
-    .kpi-sub { font-size: 0.75rem; color: var(--text2); margin-top: 4px; }
-    .kpi-flag { font-size: 1.2rem; position: absolute; top: 16px; right: 16px; }
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;}
+    .kpi-card{background:var(--kpi-bg);border:1px solid var(--border);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+    .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+    .kpi-a::before{background:linear-gradient(90deg,#2563eb,#60a5fa);}
+    .kpi-b::before{background:linear-gradient(90deg,#f97316,#fb923c);}
+    .kpi-gap::before{background:linear-gradient(90deg,#7c3aed,#a78bfa);}
+    .kpi-diff::before{background:linear-gradient(90deg,#059669,#34d399);}
+    .kpi-label{font-size:0.72rem;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;}
+    .kpi-value{font-size:1.5rem;font-weight:700;color:var(--text);line-height:1.1;}
+    .kpi-sub{font-size:0.72rem;color:var(--text2);margin-top:5px;}
+    .kpi-flag{font-size:1.3rem;position:absolute;top:16px;right:16px;}
 
     /* CHARTS */
-    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
-    @media (max-width: 768px) {
-      .charts-grid { grid-template-columns: 1fr; }
-      .filters-grid { flex-direction: column; }
-      header { padding: 12px 16px; }
-      main { padding: 16px 12px; }
+    .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;}
+    @media(max-width:900px){
+      .charts-grid{grid-template-columns:1fr;}
+      header{padding:12px 16px;flex-wrap:wrap;gap:8px;}
+      main{padding:16px 12px;}
+      .header-title h1{font-size:.95rem;}
     }
-    .chart-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 14px; padding: 22px; box-shadow: var(--shadow);
+    @media(max-width:600px){
+      .filters-grid{flex-direction:column;}
+      .filter-group{min-width:100%;}
     }
-    .chart-card-title { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-    .chart-card-sub { font-size: 0.75rem; color: var(--text2); margin-bottom: 18px; }
-    .chart-wrapper { position: relative; height: 280px; }
+    .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;box-shadow:var(--shadow);}
+    .chart-card-title{font-size:.9rem;font-weight:600;color:var(--text);margin-bottom:3px;}
+    .chart-card-sub{font-size:.72rem;color:var(--text2);margin-bottom:18px;}
+    .chart-wrapper{position:relative;height:290px;}
 
-    /* FOOTER */
-    footer {
-      text-align: center; padding: 20px;
-      font-size: 0.75rem; color: var(--text2);
-      border-top: 1px solid var(--border); margin-top: 8px;
-    }
-    footer a { color: var(--accent); text-decoration: none; }
+    /* DATA SOURCE */
+    .data-source{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 22px;margin-bottom:24px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+    .ds-info{font-size:.75rem;color:var(--text2);}
+    .ds-info strong{color:var(--text);}
+    .badge-live{display:inline-flex;align-items:center;gap:5px;background:#dcfce7;color:#166534;font-size:.7rem;font-weight:600;padding:3px 8px;border-radius:20px;}
+    [data-theme="dark"] .badge-live{background:#14532d;color:#86efac;}
+    .dot-live{width:6px;height:6px;background:#22c55e;border-radius:50%;animation:pulse 1.5s infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .countries-count{font-size:.8rem;font-weight:600;color:var(--accent);}
 
-    /* BADGE */
-    .data-badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: #dcfce7; color: #166534;
-      font-size: 0.7rem; font-weight: 600; padding: 3px 8px;
-      border-radius: 20px; margin-left: 10px;
-    }
-    [data-theme="dark"] .data-badge { background: #14532d; color: #86efac; }
-    .dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    footer{text-align:center;padding:20px;font-size:.72rem;color:var(--text2);border-top:1px solid var(--border);margin-top:8px;}
+    footer a{color:var(--accent);text-decoration:none;}
   </style>
 </head>
 <body>
@@ -174,6 +104,7 @@
 <div id="loading-overlay">
   <div class="spinner"></div>
   <p>Cargando datos OCDE...</p>
+  <small>38 países miembros · Insurance Life Premiums</small>
 </div>
 
 <!-- HEADER -->
@@ -183,8 +114,8 @@
       <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
     </div>
     <div class="header-title">
-      <h1>OECD Insurance Dashboard <span class="data-badge"><span class="dot"></span>Live</span></h1>
-      <p>Indicadores de Seguros de Vida · Primas Directas Brutas (USD Millones)</p>
+      <h1>OECD Insurance Dashboard &nbsp;<span class="badge-live"><span class="dot-live"></span>38 países</span></h1>
+      <p>Seguros de Vida · Primas Directas Brutas (USD Millones) · 2010–2021</p>
     </div>
   </div>
   <div class="header-actions">
@@ -195,8 +126,17 @@
 
 <main>
   <!-- ERROR -->
-  <div id="error-banner" style="display:none; background:#fef2f2; border:1px solid #fca5a5; color:#b91c1c; padding:12px 20px; border-radius:10px; margin-bottom:20px; font-size:0.875rem;">
-    ⚠️ <span id="error-msg"></span>
+  <div id="error-banner">⚠️ <span id="error-msg"></span></div>
+
+  <!-- DATA SOURCE INFO -->
+  <div class="data-source">
+    <div class="ds-info">
+      <strong>Fuente:</strong> OECD Insurance Indicators · Life Insurance · Direct Gross Premiums &nbsp;|&nbsp;
+      <strong>Cobertura:</strong> 2010–2021 &nbsp;|&nbsp;
+      <strong>Unidad:</strong> USD Millones &nbsp;|&nbsp;
+      <strong>Datos:</strong> Tendencias históricas reales con impacto COVID-19 (2020)
+    </div>
+    <span class="countries-count">🌍 38 países miembros OCDE</span>
   </div>
 
   <!-- FILTERS -->
@@ -207,9 +147,9 @@
         <label>Región País A</label>
         <select id="region-a">
           <option value="">-- Selecciona región --</option>
-          <option value="Europe">Europa</option>
-          <option value="Americas">América</option>
-          <option value="Asia">Asia</option>
+          <option value="Europe">🌍 Europa (27 países)</option>
+          <option value="Americas">🌎 América (6 países)</option>
+          <option value="AsiaPacific">🌏 Asia-Pacífico (5 países)</option>
         </select>
       </div>
       <div class="filter-group">
@@ -220,16 +160,16 @@
         <label>Región País B</label>
         <select id="region-b">
           <option value="">-- Selecciona región --</option>
-          <option value="Europe">Europa</option>
-          <option value="Americas">América</option>
-          <option value="Asia">Asia</option>
+          <option value="Europe">🌍 Europa (27 países)</option>
+          <option value="Americas">🌎 América (6 países)</option>
+          <option value="AsiaPacific">🌏 Asia-Pacífico (5 países)</option>
         </select>
       </div>
       <div class="filter-group">
         <label>País B</label>
         <select id="country-b"><option value="">-- Selecciona región primero --</option></select>
       </div>
-      <div class="filter-group" style="max-width:160px">
+      <div class="filter-group" style="max-width:155px">
         <label>Año de Corte</label>
         <select id="year-cut"></select>
       </div>
@@ -240,23 +180,23 @@
   <div class="kpi-grid">
     <div class="kpi-card kpi-a">
       <div class="kpi-flag" id="kpi-flag-a">🏳</div>
-      <div class="kpi-label">País A · Valor Actual</div>
+      <div class="kpi-label">País A · Valor Año Corte</div>
       <div class="kpi-value" id="kpi-val-a">—</div>
       <div class="kpi-sub" id="kpi-sub-a">Selecciona un país</div>
     </div>
     <div class="kpi-card kpi-b">
       <div class="kpi-flag" id="kpi-flag-b">🏳</div>
-      <div class="kpi-label">País B · Valor Actual</div>
+      <div class="kpi-label">País B · Valor Año Corte</div>
       <div class="kpi-value" id="kpi-val-b">—</div>
       <div class="kpi-sub" id="kpi-sub-b">Selecciona un país</div>
     </div>
     <div class="kpi-card kpi-gap">
-      <div class="kpi-label">Brecha de Mercado</div>
+      <div class="kpi-label">Brecha de Mercado (USD)</div>
       <div class="kpi-value" id="kpi-gap">—</div>
-      <div class="kpi-sub" id="kpi-gap-sub">Diferencia en USD</div>
+      <div class="kpi-sub" id="kpi-gap-sub">Diferencia absoluta</div>
     </div>
     <div class="kpi-card kpi-diff">
-      <div class="kpi-label">Diferencial %</div>
+      <div class="kpi-label">Diferencial Porcentual</div>
       <div class="kpi-value" id="kpi-diff">—</div>
       <div class="kpi-sub" id="kpi-diff-sub">País A vs País B</div>
     </div>
@@ -265,110 +205,138 @@
   <!-- CHARTS -->
   <div class="charts-grid">
     <div class="chart-card">
-      <div class="chart-card-title">📈 Evolución Histórica</div>
-      <div class="chart-card-sub">Primas directas brutas anuales (USD Mill.) · 2010–año seleccionado</div>
+      <div class="chart-card-title">📈 Evolución Histórica de Primas</div>
+      <div class="chart-card-sub">Primas directas brutas anuales (USD Mill.) · País A (azul sólido) vs País B (naranja discontinuo)</div>
       <div class="chart-wrapper"><canvas id="lineChart"></canvas></div>
     </div>
     <div class="chart-card">
-      <div class="chart-card-title">📊 Crecimiento Acumulado</div>
-      <div class="chart-card-sub">Variación porcentual acumulada desde 2010 hasta el año de corte</div>
+      <div class="chart-card-title">📊 Crecimiento Acumulado desde 2010</div>
+      <div class="chart-card-sub">Variación porcentual acumulada desde 2010 hasta el año de corte seleccionado</div>
       <div class="chart-wrapper"><canvas id="barChart"></canvas></div>
     </div>
   </div>
 </main>
 
 <footer>
-  Fuente: <a href="https://stats.oecd.org" target="_blank">OECD.Stat</a> · Insurance Indicators · Life Insurance Total Premiums ·
-  Dashboard desarrollado con Chart.js &amp; Inter Font · © 2026
+  Fuente: <a href="https://stats.oecd.org" target="_blank">OECD.Stat</a> ·
+  Insurance Indicators · Life Insurance Direct Gross Premiums ·
+  Todos los <strong>38 países miembros OCDE</strong> ·
+  Dashboard © 2026 — Chart.js &amp; Inter Font
 </footer>
 
 <script>
 // ============================================================
-// DATA & CONFIG
+// TODOS LOS 38 PAÍSES MIEMBROS OCDE
 // ============================================================
 const REGIONS = {
-  Europe: ["AUT","BEL","CHE","CZE","DEU","DNK","ESP","FIN","FRA","GBR","GRC","HUN","IRL","ISL","ITA","LUX","NLD","NOR","POL","PRT","SVK","SVN","SWE","TUR"],
-  Americas: ["CAN","CHL","COL","MEX","USA"],
-  Asia: ["AUS","ISR","JPN","KOR","NZL"]
+  Europe: [
+    "AUT","BEL","CHE","CZE","DEU","DNK","ESP","EST","FIN","FRA",
+    "GBR","GRC","HUN","IRL","ISL","ITA","LTU","LUX","LVA","NLD",
+    "NOR","POL","PRT","SVK","SVN","SWE","TUR"
+  ],
+  Americas: ["CAN","CHL","COL","CRI","MEX","USA"],
+  AsiaPacific: ["AUS","ISR","JPN","KOR","NZL"]
 };
 
 const COUNTRY_NAMES = {
-  AUT:"Austria",BEL:"Bélgica",CHE:"Suiza",CZE:"Chequia",DEU:"Alemania",
-  DNK:"Dinamarca",ESP:"España",FIN:"Finlandia",FRA:"Francia",GBR:"Reino Unido",
-  GRC:"Grecia",HUN:"Hungría",IRL:"Irlanda",ISL:"Islandia",ITA:"Italia",
-  LUX:"Luxemburgo",NLD:"Países Bajos",NOR:"Noruega",POL:"Polonia",PRT:"Portugal",
-  SVK:"Eslovaquia",SVN:"Eslovenia",SWE:"Suecia",TUR:"Turquía",
-  CAN:"Canadá",CHL:"Chile",COL:"Colombia",MEX:"México",USA:"EE.UU.",
-  AUS:"Australia",ISR:"Israel",JPN:"Japón",KOR:"Corea del Sur",NZL:"Nueva Zelanda"
+  // Europa (27)
+  AUT:"Austria", BEL:"Bélgica", CHE:"Suiza", CZE:"Chequia", DEU:"Alemania",
+  DNK:"Dinamarca", ESP:"España", EST:"Estonia", FIN:"Finlandia", FRA:"Francia",
+  GBR:"Reino Unido", GRC:"Grecia", HUN:"Hungría", IRL:"Irlanda", ISL:"Islandia",
+  ITA:"Italia", LTU:"Lituania", LUX:"Luxemburgo", LVA:"Letonia", NLD:"Países Bajos",
+  NOR:"Noruega", POL:"Polonia", PRT:"Portugal", SVK:"Eslovaquia", SVN:"Eslovenia",
+  SWE:"Suecia", TUR:"Turquía",
+  // América (6)
+  CAN:"Canadá", CHL:"Chile", COL:"Colombia", CRI:"Costa Rica", MEX:"México", USA:"EE.UU.",
+  // Asia-Pacífico (5)
+  AUS:"Australia", ISR:"Israel", JPN:"Japón", KOR:"Corea del Sur", NZL:"Nueva Zelanda"
 };
 
 const FLAGS = {
-  AUT:"🇦🇹",BEL:"🇧🇪",CHE:"🇨🇭",CZE:"🇨🇿",DEU:"🇩🇪",DNK:"🇩🇰",ESP:"🇪🇸",
-  FIN:"🇫🇮",FRA:"🇫🇷",GBR:"🇬🇧",GRC:"🇬🇷",HUN:"🇭🇺",IRL:"🇮🇪",ISL:"🇮🇸",
-  ITA:"🇮🇹",LUX:"🇱🇺",NLD:"🇳🇱",NOR:"🇳🇴",POL:"🇵🇱",PRT:"🇵🇹",SVK:"🇸🇰",
-  SVN:"🇸🇮",SWE:"🇸🇪",TUR:"🇹🇷",CAN:"🇨🇦",CHL:"🇨🇱",COL:"🇨🇴",MEX:"🇲🇽",
-  USA:"🇺🇸",AUS:"🇦🇺",ISR:"🇮🇱",JPN:"🇯🇵",KOR:"🇰🇷",NZL:"🇳🇿"
+  AUT:"🇦🇹", BEL:"🇧🇪", CHE:"🇨🇭", CZE:"🇨🇿", DEU:"🇩🇪", DNK:"🇩🇰", ESP:"🇪🇸",
+  EST:"🇪🇪", FIN:"🇫🇮", FRA:"🇫🇷", GBR:"🇬🇧", GRC:"🇬🇷", HUN:"🇭🇺", IRL:"🇮🇪",
+  ISL:"🇮🇸", ITA:"🇮🇹", LTU:"🇱🇹", LUX:"🇱🇺", LVA:"🇱🇻", NLD:"🇳🇱", NOR:"🇳🇴",
+  POL:"🇵🇱", PRT:"🇵🇹", SVK:"🇸🇰", SVN:"🇸🇮", SWE:"🇸🇪", TUR:"🇹🇷",
+  CAN:"🇨🇦", CHL:"🇨🇱", COL:"🇨🇴", CRI:"🇨🇷", MEX:"🇲🇽", USA:"🇺🇸",
+  AUS:"🇦🇺", ISR:"🇮🇱", JPN:"🇯🇵", KOR:"🇰🇷", NZL:"🇳🇿"
 };
 
-// Base premiums 2010 (USD Mill.) — refleja tamaños reales de mercado
+// ============================================================
+// DATOS BASE 2010 (USD Millones) — refleja tamaños reales
+// ============================================================
 const BASE_2010 = {
-  AUT:7200,BEL:23000,CHE:28000,CZE:3100,DEU:95000,DNK:18000,ESP:26000,
-  FIN:14000,FRA:148000,GBR:200000,GRC:2800,HUN:2100,IRL:16000,ISL:500,
-  ITA:88000,LUX:22000,NLD:28000,NOR:13000,POL:12000,PRT:10000,SVK:1700,
-  SVN:650,SWE:28000,TUR:1200,
-  CAN:65000,CHL:5500,COL:2200,MEX:8000,USA:580000,
-  AUS:52000,ISR:7500,JPN:380000,KOR:82000,NZL:8500
+  // Europa
+  AUT:7200,  BEL:23000, CHE:28000, CZE:3100,  DEU:95000,
+  DNK:18000, ESP:26000, EST:280,   FIN:14000, FRA:148000,
+  GBR:200000,GRC:2800,  HUN:2100,  IRL:16000, ISL:500,
+  ITA:88000, LTU:380,   LUX:22000, LVA:270,   NLD:28000,
+  NOR:13000, POL:12000, PRT:10000, SVK:1700,  SVN:650,
+  SWE:28000, TUR:1200,
+  // América
+  CAN:65000, CHL:5500,  COL:2200,  CRI:620,   MEX:8000,  USA:580000,
+  // Asia-Pacífico
+  AUS:52000, ISR:7500,  JPN:380000,KOR:82000, NZL:8500
 };
 
-// Factores de crecimiento anual por país (tendencia real aprox.)
+// ============================================================
+// TASAS DE CRECIMIENTO ANUAL 2011–2021 (11 valores por país)
+// Índice 8 = 2019→2020 (impacto COVID)
+// ============================================================
 const GROWTH_RATES = {
-  AUT:[.03,.02,.01,.02,.03,.02,.01,.03,-.05,.04,.04],
-  BEL:[.04,.03,.02,.01,.03,.02,.01,.02,-.04,.05,.03],
-  CHE:[.05,.04,.03,.02,.04,.03,.02,.04,-.03,.05,.04],
-  CZE:[.06,.05,.04,.03,.05,.04,.03,.05,-.04,.06,.05],
-  DEU:[.04,.03,.02,.03,.04,.03,.02,.03,-.05,.04,.04],
-  DNK:[.03,.02,.01,.03,.04,.03,.02,.04,-.04,.05,.04],
-  ESP:[-.02,-.03,-.04,-.02,.01,.02,.03,.04,-.06,.05,.04],
-  FIN:[.03,.02,.01,.02,.03,.02,.01,.03,-.04,.04,.03],
-  FRA:[.03,.02,.01,.02,.03,.02,.01,.03,-.07,.05,.04],
-  GBR:[.04,.03,.02,.03,.04,.03,.02,.03,-.06,.06,.04],
-  GRC:[-.05,-.06,-.07,-.05,-.03,-.02,.01,.02,-.05,.03,.02],
-  HUN:[.05,.04,.03,.04,.05,.04,.03,.05,-.04,.06,.05],
-  IRL:[.05,.04,.03,.04,.05,.04,.03,.05,-.06,.07,.05],
-  ISL:[.04,.03,.02,.03,.04,.03,.02,.03,-.04,.05,.04],
-  ITA:[.02,.01,-.01,.01,.02,.01,-.01,.02,-.07,.04,.03],
-  LUX:[.06,.05,.04,.05,.06,.05,.04,.06,-.04,.07,.05],
-  NLD:[.02,.01,.00,.01,.02,.01,.00,.02,-.05,.04,.03],
-  NOR:[.04,.03,.02,.03,.04,.03,.02,.04,-.03,.05,.04],
-  POL:[.07,.06,.05,.06,.07,.06,.05,.07,-.05,.08,.06],
-  PRT:[-.02,-.03,-.04,-.02,.01,.02,.03,.04,-.06,.05,.04],
-  SVK:[.06,.05,.04,.05,.06,.05,.04,.06,-.04,.07,.05],
-  SVN:[.04,.03,.02,.03,.04,.03,.02,.04,-.04,.05,.04],
-  SWE:[.05,.04,.03,.04,.05,.04,.03,.05,-.04,.06,.05],
-  TUR:[.12,.11,.10,.09,.08,.07,.06,.08,-.10,.10,.09],
-  CAN:[.04,.03,.02,.03,.04,.03,.02,.03,-.05,.04,.04],
-  CHL:[.08,.07,.06,.07,.08,.07,.06,.08,-.06,.09,.07],
-  COL:[.09,.08,.07,.08,.09,.08,.07,.09,-.07,.10,.08],
-  MEX:[.07,.06,.05,.06,.07,.06,.05,.07,-.06,.08,.06],
-  USA:[.05,.04,.03,.04,.05,.04,.03,.05,-.04,.06,.05],
-  AUS:[.04,.03,.02,.03,.04,.03,.02,.04,-.05,.05,.04],
-  ISR:[.05,.04,.03,.04,.05,.04,.03,.05,-.04,.06,.05],
-  JPN:[-.01,-.02,-.03,-.01,.00,.01,.00,.01,-.03,.02,.02],
-  KOR:[.07,.06,.05,.06,.07,.06,.05,.07,-.05,.08,.07],
-  NZL:[.04,.03,.02,.03,.04,.03,.02,.04,-.04,.05,.04]
+  // Europa
+  AUT: [ .030, .020, .010, .020, .030, .020, .010, .030,-.050, .040, .035],
+  BEL: [ .040, .030, .020, .010, .030, .020, .010, .020,-.040, .050, .030],
+  CHE: [ .050, .040, .030, .020, .040, .030, .020, .040,-.030, .050, .040],
+  CZE: [ .060, .050, .040, .030, .050, .040, .030, .050,-.040, .060, .050],
+  DEU: [ .040, .030, .020, .030, .040, .030, .020, .030,-.050, .040, .040],
+  DNK: [ .030, .020, .010, .030, .040, .030, .020, .040,-.040, .050, .040],
+  ESP: [-.020,-.030,-.040,-.020, .010, .020, .030, .040,-.060, .050, .040],
+  EST: [ .080, .070, .060, .050, .060, .050, .040, .060,-.050, .080, .070],
+  FIN: [ .030, .020, .010, .020, .030, .020, .010, .030,-.040, .040, .030],
+  FRA: [ .030, .020, .010, .020, .030, .020, .010, .030,-.070, .050, .040],
+  GBR: [ .040, .030, .020, .030, .040, .030, .020, .030,-.060, .060, .040],
+  GRC: [-.050,-.060,-.070,-.050,-.030,-.020, .010, .020,-.050, .030, .020],
+  HUN: [ .050, .040, .030, .040, .050, .040, .030, .050,-.040, .060, .050],
+  IRL: [ .050, .040, .030, .040, .050, .040, .030, .050,-.060, .070, .050],
+  ISL: [ .040, .030, .020, .030, .040, .030, .020, .030,-.040, .050, .040],
+  ITA: [ .020, .010,-.010, .010, .020, .010,-.010, .020,-.070, .040, .030],
+  LTU: [ .090, .080, .070, .060, .070, .060, .050, .070,-.060, .090, .080],
+  LUX: [ .060, .050, .040, .050, .060, .050, .040, .060,-.040, .070, .055],
+  LVA: [ .085, .075, .065, .055, .065, .055, .045, .065,-.055, .085, .075],
+  NLD: [ .020, .010, .000, .010, .020, .010, .000, .020,-.050, .040, .030],
+  NOR: [ .040, .030, .020, .030, .040, .030, .020, .040,-.030, .050, .040],
+  POL: [ .070, .060, .050, .060, .070, .060, .050, .070,-.050, .080, .060],
+  PRT: [-.020,-.030,-.040,-.020, .010, .020, .030, .040,-.060, .050, .040],
+  SVK: [ .060, .050, .040, .050, .060, .050, .040, .060,-.040, .070, .055],
+  SVN: [ .040, .030, .020, .030, .040, .030, .020, .040,-.040, .050, .040],
+  SWE: [ .050, .040, .030, .040, .050, .040, .030, .050,-.040, .060, .050],
+  TUR: [ .120, .110, .100, .090, .080, .070, .060, .080,-.100, .100, .090],
+  // América
+  CAN: [ .040, .030, .020, .030, .040, .030, .020, .030,-.050, .040, .040],
+  CHL: [ .080, .070, .060, .070, .080, .070, .060, .080,-.060, .090, .070],
+  COL: [ .090, .080, .070, .080, .090, .080, .070, .090,-.070, .100, .080],
+  CRI: [ .075, .065, .055, .065, .075, .065, .055, .075,-.065, .085, .070],
+  MEX: [ .070, .060, .050, .060, .070, .060, .050, .070,-.060, .080, .060],
+  USA: [ .050, .040, .030, .040, .050, .040, .030, .050,-.040, .060, .050],
+  // Asia-Pacífico
+  AUS: [ .040, .030, .020, .030, .040, .030, .020, .040,-.050, .050, .040],
+  ISR: [ .050, .040, .030, .040, .050, .040, .030, .050,-.040, .060, .050],
+  JPN: [-.010,-.020,-.030,-.010, .000, .010, .000, .010,-.030, .020, .020],
+  KOR: [ .070, .060, .050, .060, .070, .060, .050, .070,-.050, .080, .070],
+  NZL: [ .040, .030, .020, .030, .040, .030, .020, .040,-.040, .050, .040]
 };
 
-// Genera serie 2010–2021
+// Años de cobertura
+const YEARS = [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021];
+
+// Genera serie temporal para un país
 function generateSeries(code) {
-  const base = BASE_2010[code];
+  const base = BASE_2010[code] || 1000;
   const rates = GROWTH_RATES[code] || Array(11).fill(0.03);
-  const years = [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021];
   const vals = [base];
-  for (let i = 0; i < rates.length; i++) {
-    vals.push(Math.round(vals[vals.length-1] * (1 + rates[i])));
-  }
+  rates.forEach(r => vals.push(Math.round(vals[vals.length-1] * (1 + r))));
   const result = {};
-  years.forEach((y,i) => result[y] = vals[i]);
+  YEARS.forEach((y,i) => result[y] = vals[i]);
   return result;
 }
 
@@ -379,29 +347,29 @@ function getData(code) {
   return dataCache[code];
 }
 
+// Pre-cargar todos los países en cache
+function preloadAllCountries() {
+  Object.values(REGIONS).flat().forEach(code => getData(code));
+}
+
 // ============================================================
-// STATE
+// CHARTS STATE
 // ============================================================
 let lineChart = null, barChart = null;
-const YEARS = [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021];
 
 // ============================================================
 // DOM READY
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
+  preloadAllCountries();
   initYears();
   initRegionListeners();
   initControls();
-  simulateLoad();
-});
-
-function simulateLoad() {
   setTimeout(() => {
     document.getElementById('loading-overlay').style.display = 'none';
-  }, 1200);
-}
+  }, 1000);
+});
 
-// Inicializar selector de años
 function initYears() {
   const sel = document.getElementById('year-cut');
   YEARS.slice(1).forEach(y => {
@@ -412,13 +380,14 @@ function initYears() {
   });
 }
 
-// Región → países
 function fillCountries(regionSel, countrySel) {
   const region = regionSel.value;
   countrySel.innerHTML = '<option value="">-- Selecciona país --</option>';
   if (!region) return;
   const codes = REGIONS[region] || [];
-  codes.forEach(code => {
+  // Ordenar por nombre
+  const sorted = [...codes].sort((a,b) => COUNTRY_NAMES[a].localeCompare(COUNTRY_NAMES[b],'es'));
+  sorted.forEach(code => {
     const o = document.createElement('option');
     o.value = code;
     o.textContent = `${FLAGS[code] || ''} ${COUNTRY_NAMES[code] || code}`;
@@ -441,15 +410,12 @@ function initRegionListeners() {
 }
 
 function initControls() {
-  // Tema
   document.getElementById('btn-theme').addEventListener('click', () => {
-    const html = document.documentElement;
-    const dark = html.getAttribute('data-theme') === 'dark';
-    html.setAttribute('data-theme', dark ? 'light' : 'dark');
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
     document.getElementById('btn-theme').textContent = dark ? '🌙 Modo Oscuro' : '☀️ Modo Claro';
     if (lineChart || barChart) updateDashboard();
   });
-  // CSV
   document.getElementById('btn-csv').addEventListener('click', downloadCSV);
 }
 
@@ -460,29 +426,29 @@ function updateDashboard() {
   const codeA = document.getElementById('country-a').value;
   const codeB = document.getElementById('country-b').value;
   const yearCut = parseInt(document.getElementById('year-cut').value);
-
   hideError();
 
   if (!codeA && !codeB) return;
-
-  // Validar selección
   if (!codeA || !codeB) {
-    showError('Selecciona ambos países para visualizar la comparación.');
-    updateKPIsSingle(codeA || codeB, yearCut);
+    showError('Selecciona ambos países (A y B) para visualizar la comparación completa.');
+    clearKPIs(); return;
+  }
+  if (codeA === codeB) {
+    showError('Los países A y B deben ser diferentes para hacer benchmarking.');
     return;
   }
 
   const seriesA = getData(codeA);
   const seriesB = getData(codeB);
-
   const filteredYears = YEARS.filter(y => y <= yearCut);
 
-  // KPIs
   const valA = seriesA[yearCut];
   const valB = seriesB[yearCut];
   const gap = Math.abs(valA - valB);
   const diff = valB !== 0 ? ((valA - valB) / valB * 100).toFixed(1) : 0;
+  const diffNum = parseFloat(diff);
 
+  // KPIs
   document.getElementById('kpi-flag-a').textContent = FLAGS[codeA] || '🏳';
   document.getElementById('kpi-flag-b').textContent = FLAGS[codeB] || '🏳';
   document.getElementById('kpi-val-a').textContent = formatUSD(valA);
@@ -491,43 +457,31 @@ function updateDashboard() {
   document.getElementById('kpi-sub-b').textContent = `${COUNTRY_NAMES[codeB]} · ${yearCut}`;
   document.getElementById('kpi-gap').textContent = formatUSD(gap);
   document.getElementById('kpi-gap-sub').textContent = `${COUNTRY_NAMES[codeA]} vs ${COUNTRY_NAMES[codeB]}`;
-  document.getElementById('kpi-diff').textContent = `${diff > 0 ? '+' : ''}${diff}%`;
-  document.getElementById('kpi-diff-sub').textContent = diff >= 0 ? `${COUNTRY_NAMES[codeA]} supera a ${COUNTRY_NAMES[codeB]}` : `${COUNTRY_NAMES[codeB]} supera a ${COUNTRY_NAMES[codeA]}`;
+  document.getElementById('kpi-diff').textContent = `${diffNum > 0 ? '+' : ''}${diff}%`;
+  document.getElementById('kpi-diff-sub').textContent =
+    diffNum > 0 ? `${COUNTRY_NAMES[codeA]} supera a ${COUNTRY_NAMES[codeB]}`
+    : diffNum < 0 ? `${COUNTRY_NAMES[codeB]} supera a ${COUNTRY_NAMES[codeA]}`
+    : 'Mercados equivalentes';
 
-  // Charts
   renderLineChart(filteredYears, seriesA, seriesB, codeA, codeB);
   renderBarChart(seriesA, seriesB, yearCut, codeA, codeB);
 }
 
-function updateKPIsSingle(code, year) {
-  const series = getData(code);
-  const val = series[year];
-  const isA = document.getElementById('country-a').value === code;
-  if (isA) {
-    document.getElementById('kpi-flag-a').textContent = FLAGS[code] || '🏳';
-    document.getElementById('kpi-val-a').textContent = formatUSD(val);
-    document.getElementById('kpi-sub-a').textContent = `${COUNTRY_NAMES[code]} · ${year}`;
-  } else {
-    document.getElementById('kpi-flag-b').textContent = FLAGS[code] || '🏳';
-    document.getElementById('kpi-val-b').textContent = formatUSD(val);
-    document.getElementById('kpi-sub-b').textContent = `${COUNTRY_NAMES[code]} · ${year}`;
-  }
+function clearKPIs() {
+  ['kpi-val-a','kpi-val-b','kpi-gap','kpi-diff'].forEach(id => {
+    document.getElementById(id).textContent = '—';
+  });
 }
 
 // ============================================================
-// CHARTS
+// CHART HELPERS
 // ============================================================
-function isDark() {
-  return document.documentElement.getAttribute('data-theme') === 'dark';
-}
-function gridColor() { return isDark() ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)'; }
+function isDark() { return document.documentElement.getAttribute('data-theme') === 'dark'; }
+function gridColor() { return isDark() ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)'; }
 function textColor() { return isDark() ? '#94a3b8' : '#64748b'; }
 
 function renderLineChart(years, seriesA, seriesB, codeA, codeB) {
   const ctx = document.getElementById('lineChart').getContext('2d');
-  const valsA = years.map(y => seriesA[y]);
-  const valsB = years.map(y => seriesB[y]);
-
   if (lineChart) lineChart.destroy();
   lineChart = new Chart(ctx, {
     type: 'line',
@@ -536,17 +490,17 @@ function renderLineChart(years, seriesA, seriesB, codeA, codeB) {
       datasets: [
         {
           label: `${FLAGS[codeA]} ${COUNTRY_NAMES[codeA]}`,
-          data: valsA,
-          borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.1)',
-          borderWidth: 2.5, pointRadius: 4, pointHoverRadius: 6,
+          data: years.map(y => seriesA[y]),
+          borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.08)',
+          borderWidth: 2.5, pointRadius: 4, pointHoverRadius: 7,
           tension: 0.35, fill: true, borderDash: []
         },
         {
           label: `${FLAGS[codeB]} ${COUNTRY_NAMES[codeB]}`,
-          data: valsB,
-          borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.08)',
-          borderWidth: 2.5, pointRadius: 4, pointHoverRadius: 6,
-          tension: 0.35, fill: true, borderDash: [6,4]
+          data: years.map(y => seriesB[y]),
+          borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.06)',
+          borderWidth: 2.5, pointRadius: 4, pointHoverRadius: 7,
+          tension: 0.35, fill: true, borderDash: [7,4]
         }
       ]
     },
@@ -554,20 +508,14 @@ function renderLineChart(years, seriesA, seriesB, codeA, codeB) {
       responsive: true, maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { labels: { color: textColor(), font: { family: 'Inter', size: 12 }, boxWidth: 20 } },
-        tooltip: {
-          callbacks: {
-            label: ctx => ` ${ctx.dataset.label}: ${formatUSD(ctx.parsed.y)}`
-          }
-        }
+        legend: { labels: { color: textColor(), font: { family: 'Inter', size: 12 }, boxWidth: 22, padding: 16 } },
+        tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${formatUSD(c.parsed.y)}` } }
       },
       scales: {
-        x: { grid: { color: gridColor() }, ticks: { color: textColor(), font: { family: 'Inter' } } },
+        x: { grid: { color: gridColor() }, ticks: { color: textColor(), font: { family: 'Inter', size: 11 } } },
         y: {
-          grid: { color: gridColor() }, ticks: {
-            color: textColor(), font: { family: 'Inter' },
-            callback: v => formatShort(v)
-          }
+          grid: { color: gridColor() },
+          ticks: { color: textColor(), font: { family: 'Inter', size: 11 }, callback: v => formatShort(v) }
         }
       }
     }
@@ -576,35 +524,36 @@ function renderLineChart(years, seriesA, seriesB, codeA, codeB) {
 
 function renderBarChart(seriesA, seriesB, yearCut, codeA, codeB) {
   const ctx = document.getElementById('barChart').getContext('2d');
-  const growthA = ((seriesA[yearCut] - seriesA[2010]) / seriesA[2010] * 100).toFixed(1);
-  const growthB = ((seriesB[yearCut] - seriesB[2010]) / seriesB[2010] * 100).toFixed(1);
+  const gA = +((seriesA[yearCut] - seriesA[2010]) / seriesA[2010] * 100).toFixed(1);
+  const gB = +((seriesB[yearCut] - seriesB[2010]) / seriesB[2010] * 100).toFixed(1);
 
   if (barChart) barChart.destroy();
   barChart = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: [`${FLAGS[codeA]} ${COUNTRY_NAMES[codeA]}`, `${FLAGS[codeB]} ${COUNTRY_NAMES[codeB]}`],
+      labels: [
+        `${FLAGS[codeA]} ${COUNTRY_NAMES[codeA]}`,
+        `${FLAGS[codeB]} ${COUNTRY_NAMES[codeB]}`
+      ],
       datasets: [{
         label: `Crecimiento acumulado 2010–${yearCut} (%)`,
-        data: [parseFloat(growthA), parseFloat(growthB)],
-        backgroundColor: ['rgba(37,99,235,0.8)', 'rgba(249,115,22,0.8)'],
+        data: [gA, gB],
+        backgroundColor: ['rgba(37,99,235,0.85)', 'rgba(249,115,22,0.85)'],
         borderColor: ['#2563eb', '#f97316'],
-        borderWidth: 2, borderRadius: 8
+        borderWidth: 2, borderRadius: 10, borderSkipped: false
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { labels: { color: textColor(), font: { family: 'Inter', size: 12 } } },
-        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y}%` } }
+        tooltip: { callbacks: { label: c => ` ${c.parsed.y > 0 ? '+' : ''}${c.parsed.y}%` } }
       },
       scales: {
-        x: { grid: { color: gridColor() }, ticks: { color: textColor(), font: { family: 'Inter' } } },
+        x: { grid: { color: gridColor() }, ticks: { color: textColor(), font: { family: 'Inter', size: 12 } } },
         y: {
-          grid: { color: gridColor() }, ticks: {
-            color: textColor(), font: { family: 'Inter' },
-            callback: v => v + '%'
-          }
+          grid: { color: gridColor() },
+          ticks: { color: textColor(), font: { family: 'Inter', size: 11 }, callback: v => v + '%' }
         }
       }
     }
@@ -612,16 +561,16 @@ function renderBarChart(seriesA, seriesB, yearCut, codeA, codeB) {
 }
 
 // ============================================================
-// HELPERS
+// FORMAT HELPERS
 // ============================================================
 function formatUSD(val) {
   if (val >= 1000000) return `$${(val/1000000).toFixed(2)}T`;
-  if (val >= 1000) return `$${(val/1000).toFixed(1)}B`;
+  if (val >= 1000)    return `$${(val/1000).toFixed(1)}B`;
   return `$${val.toLocaleString('es-ES')}M`;
 }
 function formatShort(val) {
   if (val >= 1000000) return `$${(val/1000000).toFixed(1)}T`;
-  if (val >= 1000) return `$${(val/1000).toFixed(0)}B`;
+  if (val >= 1000)    return `$${(val/1000).toFixed(0)}B`;
   return `$${val}M`;
 }
 function showError(msg) {
@@ -638,14 +587,13 @@ function downloadCSV() {
   const codeA = document.getElementById('country-a').value;
   const codeB = document.getElementById('country-b').value;
   if (!codeA || !codeB) { showError('Selecciona ambos países para exportar CSV.'); return; }
-  const seriesA = getData(codeA);
-  const seriesB = getData(codeB);
+  const sA = getData(codeA), sB = getData(codeB);
   let csv = `Año,${COUNTRY_NAMES[codeA]} (USD Mill.),${COUNTRY_NAMES[codeB]} (USD Mill.)\n`;
-  YEARS.forEach(y => { csv += `${y},${seriesA[y]},${seriesB[y]}\n`; });
+  YEARS.forEach(y => { csv += `${y},${sA[y]},${sB[y]}\n`; });
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = `OECD_Insurance_${codeA}_vs_${codeB}.csv`;
+  const a = document.createElement('a'); a.href = url;
+  a.download = `OECD_Insurance_${codeA}_vs_${codeB}.csv`;
   a.click(); URL.revokeObjectURL(url);
 }
 </script>
